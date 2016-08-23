@@ -1,0 +1,1877 @@
+
+boot:
+  0000: 14 00 7a 02    call 0x027a<load string messages>
+  0004: 03 00 00 00    Set BG color to 0
+  0008: 20 0b 00 00    R11 <- 0x0000
+  000c: 20 0c 00 00    R12 <- 0x0000
+  0010: 20 03 00 00    R3 <- 0x0000
+
+main__print_welcome_and_prompt:
+  0014: 20 0a 00 00    R10 <- 0x0000
+  0018: 14 00 68 01    call 0x0168<draw_str_from_bank[r10]_and_newline>
+  001c: 20 0a 01 00    R10 <- 0x0001
+  0020: 14 00 68 01    call 0x0168<draw_str_from_bank[r10]_and_newline>
+
+main__input_loop:
+  0024: 20 0a 05 00    R10 <- 0x0005
+  0028: 14 00 62 02    call 0x0262<sleep(R10)>
+  002c: c0 0f 00 00    push R15
+  0030: 22 0f f0 ff    R15 <- *[0xfff0<I/O input>]
+  0034: 60 0f ff 00    R15 &= 0x00ff
+  0038: 12 00 44 00    if cond0, jmp 0x0044<?>
+  003c: c1 00 00 00    pop R0
+  0040: 10 00 48 00    jmp 0x0048<?>
+  0044: c1 00 00 00    pop R0
+  0048: 20 0a 02 00    R10 <- 0x0002 ; drawing stars for code...
+  004c: 63 0f 01 00    Test(R15 & 0x0001)
+  0050: 12 00 5c 00    if cond0, jmp 0x005c<?>
+  0054: 14 00 84 01    call 0x0184<draw_str_from_bank[r10]_and_r3+=1>
+  0058: c0 0f 00 00    push R15
+  005c: 63 0f 02 00    Test(R15 & 0x0002)
+  0060: 12 00 6c 00    if cond0, jmp 0x006c<?>
+  0064: 14 00 84 01    call 0x0184<draw_str_from_bank[r10]_and_r3+=1>
+  0068: c0 0f 00 00    push R15
+  006c: 63 0f 04 00    Test(R15 & 0x0004)
+  0070: 12 00 7c 00    if cond0, jmp 0x007c<?>
+  0074: 14 00 84 01    call 0x0184<draw_str_from_bank[r10]_and_r3+=1>
+  0078: c0 0f 00 00    push R15
+  007c: 63 0f 08 00    Test(R15 & 0x0008)
+  0080: 12 00 8c 00    if cond0, jmp 0x008c<?>
+  0084: 14 00 84 01    call 0x0184<draw_str_from_bank[r10]_and_r3+=1>
+  0088: c0 0f 00 00    push R15
+  008c: 20 0f 00 00    R15 <- 0x0000
+  0090: 53 03 08 00    Cmp(R3 - 0x0008)
+  0094: 12 00 9c 00    if cond0, jmp 0x009c<test_konami_code_88442121_from_stack> ; Print 3 things and continue...
+  0098: 10 00 24 00    jmp 0x0024<main__input_loop>
+
+test_konami_code_88442121_from_stack:
+  009c: 20 04 01 00    R4 <- 0x0001
+  00a0: c1 0d 00 00    pop R13
+  00a4: 53 0d 02 00    Cmp(R13 - 0x0002)
+  00a8: 17 01 0c 01    if cond1, call 0x010c<set_0_to_r4>
+  00ac: c1 0d 00 00    pop R13
+  00b0: 53 0d 01 00    Cmp(R13 - 0x0001)
+  00b4: 17 01 0c 01    if cond1, call 0x010c<set_0_to_r4>
+  00b8: c1 0d 00 00    pop R13
+  00bc: 53 0d 02 00    Cmp(R13 - 0x0002)
+  00c0: 17 01 0c 01    if cond1, call 0x010c<set_0_to_r4>
+  00c4: c1 0d 00 00    pop R13
+  00c8: 53 0d 01 00    Cmp(R13 - 0x0001)
+  00cc: 17 01 0c 01    if cond1, call 0x010c<set_0_to_r4>
+  00d0: c1 0d 00 00    pop R13
+  00d4: 53 0d 04 00    Cmp(R13 - 0x0004)
+  00d8: 17 01 0c 01    if cond1, call 0x010c<set_0_to_r4>
+  00dc: c1 0d 00 00    pop R13
+  00e0: 53 0d 04 00    Cmp(R13 - 0x0004)
+  00e4: 17 01 0c 01    if cond1, call 0x010c<set_0_to_r4>
+  00e8: c1 0d 00 00    pop R13
+  00ec: 53 0d 08 00    Cmp(R13 - 0x0008)
+  00f0: 17 01 0c 01    if cond1, call 0x010c<set_0_to_r4>
+  00f4: c1 0d 00 00    pop R13
+  00f8: 53 0d 08 00    Cmp(R13 - 0x0008)
+  00fc: 17 01 0c 01    if cond1, call 0x010c<set_0_to_r4>
+  0100: 53 04 00 00    Cmp(R4 - 0x0000)
+  0104: 12 00 3c 01    if cond0, jmp 0x013c<show_failure_msg>
+  0108: 14 00 14 01    call 0x0114<show_good_msg>
+
+set_0_to_r4:
+  010c: 20 04 00 00    R4 <- 0x0000
+  0110: 15 00 00 00    return
+
+show_good_msg:
+  0114: 40 0c 08 00    R12 += 0x0008
+  0118: 20 0b 00 00    R11 <- 0x0000
+  011c: 20 0a 04 00    R10 <- 0x0004 ; print good message
+  0120: 14 00 68 01    call 0x0168<draw_str_from_bank[r10]_and_newline>
+  0124: 03 00 04 00    Set BG color to 4
+  0128: 20 0b 32 00    R11 <- 0x0032 ; draw sprite 50x32 pxls at (50,50)
+  012c: 20 0c 32 00    R12 <- 0x0032
+  0130: 04 00 32 20    Set sprite to HxW 0x2032
+  0134: 05 cb 8e 1c    Draw sprite from 0x1c8e<image_win> at (R11, R12)
+  0138: 14 00 e8 01    call 0x01e8<Play_the_music>
+
+show_failure_msg:
+  013c: 03 00 03 00    Set BG color to 3
+  0140: 20 03 00 00    R3 <- 0x0000
+  0144: 40 0c 08 00    R12 += 0x0008
+  0148: 20 0b 00 00    R11 <- 0x0000
+  014c: 20 0a 03 00    R10 <- 0x0003 ; print bad message
+  0150: 14 00 68 01    call 0x0168<draw_str_from_bank[r10]_and_newline>
+  0154: 20 0a 78 00    R10 <- 0x0078
+  0158: 14 00 62 02    call 0x0262<sleep(R10)>
+  015c: 20 0c 00 00    R12 <- 0x0000
+  0160: 01 00 00 00    Clear Screen
+  0164: 10 00 14 00    jmp 0x0014<main__print_welcome_and_prompt>
+
+draw_str_from_bank[r10]_and_newline:
+  0168: 90 0a 02 00    R10 *= 0x0002
+  016c: 40 0a 4c 03    R10 += 0x034c
+  0170: 23 aa 00 00    R10 <- *[R10]
+  0174: 14 00 9c 01    call 0x019c<draw_string_r10>
+  0178: 20 0b 00 00    R11 <- 0x0000 ; Go to next line
+  017c: 40 0c 08 00    R12 += 0x0008
+  0180: 15 00 00 00    return
+
+draw_str_from_bank[r10]_and_r3+=1:
+  0184: 40 03 01 00    R3 += 0x0001
+  0188: 90 0a 02 00    R10 *= 0x0002
+  018c: 40 0a 4c 03    R10 += 0x034c
+  0190: 23 aa 00 00    R10 <- *[R10]
+  0194: 14 00 9c 01    call 0x019c<draw_string_r10>
+  0198: 15 00 00 00    return
+
+draw_string_r10:
+  019c: 04 00 04 08    Set sprite to HxW 0x0804
+  01a0: c0 00 00 00    push R0
+  01a4: 23 a0 00 00    R0 <- *[R10]
+  01a8: 60 00 ff 00    R0 &= 0x00ff
+  01ac: 12 00 e0 01    if cond0, jmp 0x01e0<?>
+  01b0: 50 00 20 00    R0 -= 0x0020
+  01b4: 12 09 c4 01    if cond9, jmp 0x01c4<?>
+  01b8: 90 00 20 00    R0 *= 0x0020
+  01bc: 40 00 52 03    R0 += 0x0352
+  01c0: 06 cb 00 00    Draw sprite from R0 at (R11, R12)
+  01c4: 40 0b 08 00    R11 += 0x0008 ; R11 = col (+= 8 / char), R12 = line
+  01c8: 53 0b 40 01    Cmp(R11 - 0x0140) ; screen width is 320 px = 40 chars
+  01cc: 12 0d d8 01    if cond13, jmp 0x01d8<?>
+  01d0: 20 0b 00 00    R11 <- 0x0000
+  01d4: 40 0c 08 00    R12 += 0x0008
+  01d8: 40 0a 01 00    R10 += 0x0001
+  01dc: 10 00 a4 01    jmp 0x01a4<?>
+  01e0: c1 00 00 00    pop R0
+  01e4: 15 00 00 00    return
+
+Play_the_music:
+  01e8: 0e 11 d9 f1    Set sound generation parameters: AD=0x11, VTSR=0xf1d9
+  01ec: 20 04 52 0f    R4 <- 0x0f52
+  01f0: 20 02 58 02    R2 <- 0x0258 ; R2 = addr 0x0258 in code... (global var?)
+  01f4: 20 03 5c 02    R3 <- 0x025c
+  01f8: 23 41 00 00    R1 <- *[R4]
+  01fc: 53 01 ff ff    Cmp(R1 - 0xffff)
+  0200: 12 00 e8 01    if cond0, jmp 0x01e8<Play_the_music>
+  0204: 31 21 00 00    *[R2] <- R1
+  0208: 24 15 00 00    R5 <- R1
+  020c: 40 04 02 00    R4 += 0x0002
+  0210: 23 41 00 00    R1 <- *[R4]
+  0214: 31 31 00 00    *[R3] <- R1
+  0218: 53 05 00 00    Cmp(R5 - 0x0000)
+  021c: 12 00 24 02    if cond0, jmp 0x0224<?>
+  0220: 14 00 5a 02    call 0x025a<play_tone_SELFMODCODE(R2)>
+  0224: 24 1a 00 00    R10 <- R1
+  0228: 14 00 34 02    call 0x0234<sleep(R10)>
+  022c: 40 04 02 00    R4 += 0x0002
+  0230: 10 00 f8 01    jmp 0x01f8<?>
+
+sleep(R10):
+  0234: a0 0a 14 00    R10 /= 0x0014
+  0238: 53 0a 00 00    Cmp(R10 - 0x0000)
+  023c: 12 00 4c 02    if cond0, jmp 0x024c<?>
+  0240: 02 00 00 00    Wait for VBlank
+  0244: 50 0a 01 00    R10 -= 0x0001
+  0248: 10 00 38 02    jmp 0x0238<?>
+  024c: 15 00 00 00    return
+  0250: 02 00 00 00    Wait for VBlank
+  0254: 10 00 50 02    jmp 0x0250<?>
+  0258: 00 00 0d 02    ??
+
+play_tone_SELFMODCODE(R2):
+  025a: 0d 02 00 00    Play tone from R2 for 0 ms
+  025e: 15 00 00 00    return
+
+sleep(R10):
+  0262: 53 0a 00 00    Cmp(R10 - 0x0000)
+  0266: 12 0e 76 02    if cond14, jmp 0x0276<?>
+  026a: 02 00 00 00    Wait for VBlank
+  026e: 50 0a 01 00    R10 -= 0x0001
+  0272: 10 00 62 02    jmp 0x0262<sleep(R10)>
+  0276: 15 00 00 00    return
+
+load string messages:
+  027a: c0 00 00 00    push R0
+  027e: c0 01 00 00    push R1
+  0282: 20 00 4c 03    R0 <- 0x034c
+  0286: 20 01 ca 02    R1 <- 0x02ca
+  028a: 31 01 00 00    *[R0] <- R1 ; 0x034c = str_array[0] = welcome message
+  028e: 40 00 02 00    R0 += 0x0002
+  0292: 20 01 0b 03    R1 <- 0x030b
+  0296: 31 01 00 00    *[R0] <- R1 ; str_array[1] = "Please, enter the password :"
+  029a: 40 00 02 00    R0 += 0x0002
+  029e: 20 01 28 03    R1 <- 0x0328
+  02a2: 31 01 00 00    *[R0] <- R1 ; str_array[2] = "*"
+  02a6: 40 00 02 00    R0 += 0x0002
+  02aa: 20 01 2a 03    R1 <- 0x032a
+  02ae: 31 01 00 00    *[R0] <- R1 ; str_array[3] = "Bad password !"
+  02b2: 40 00 02 00    R0 += 0x0002
+  02b6: 20 01 39 03    R1 <- 0x0339
+  02ba: 31 01 00 00    *[R0] <- R1 ; str_array[4] = "You lucky bastard."
+  02be: c1 01 00 00    pop R1
+  02c2: c1 00 00 00    pop R0
+  02c6: 15 00 00 00    return
+welcome msg:
+  02ca: b'Hack In Paris - CHIP16 !        '
+  02ea: b'        merenwen@hackinparis.com'
+  030a: b'\x00'
+Prompt:
+  030b: b'Please, enter the password :\x00'
+"*":
+  0328: b'*\x00'
+"Bad password !":
+  032a: b'Bad password !\x00'
+"You lucky bastard.":
+  0339: b'You lucky bastard.\x00'
+str_array[0]:
+  034c: b'\x00\x00'
+str_array[1]:
+  034e: b'\x00\x00'
+str_array[2]:
+  0350: b'\x00\x00'
+font_bitmap:
+  0352: 11 11 11 11  font<' '>  '        '
+  0356: 11 11 11 11  font<' '>  '        '
+  035a: 11 11 11 11  font<' '>  '        '
+  035e: 11 11 11 11  font<' '>  '        '
+  0362: 11 11 11 11  font<' '>  '        '
+  0366: 11 11 11 11  font<' '>  '        '
+  036a: 11 11 11 11  font<' '>  '        '
+  036e: 11 11 11 11  font<' '>  '        '
+  0372: 11 1f f1 11  font<'!'>  '   ##   '
+  0376: 11 1f f1 11  font<'!'>  '   ##   '
+  037a: 11 1f f1 11  font<'!'>  '   ##   '
+  037e: 11 1f f1 11  font<'!'>  '   ##   '
+  0382: 11 1f f1 11  font<'!'>  '   ##   '
+  0386: 11 11 11 11  font<'!'>  '        '
+  038a: 11 1f f1 11  font<'!'>  '   ##   '
+  038e: 11 11 11 11  font<'!'>  '        '
+  0392: 1f f1 ff 11  font<'"'>  ' ## ##  '
+  0396: 1f f1 ff 11  font<'"'>  ' ## ##  '
+  039a: 1f f1 ff 11  font<'"'>  ' ## ##  '
+  039e: 11 11 11 11  font<'"'>  '        '
+  03a2: 11 11 11 11  font<'"'>  '        '
+  03a6: 11 11 11 11  font<'"'>  '        '
+  03aa: 11 11 11 11  font<'"'>  '        '
+  03ae: 11 11 11 11  font<'"'>  '        '
+  03b2: 11 ff 1f f1  font<'#'>  '  ## ## '
+  03b6: 11 ff 1f f1  font<'#'>  '  ## ## '
+  03ba: 1f ff ff ff  font<'#'>  ' #######'
+  03be: 11 ff 1f f1  font<'#'>  '  ## ## '
+  03c2: 1f ff ff ff  font<'#'>  ' #######'
+  03c6: 11 ff 1f f1  font<'#'>  '  ## ## '
+  03ca: 11 ff 1f f1  font<'#'>  '  ## ## '
+  03ce: 11 11 11 11  font<'#'>  '        '
+  03d2: 11 11 ff 11  font<'$'>  '    ##  '
+  03d6: 11 ff ff ff  font<'$'>  '  ######'
+  03da: 1f f1 f1 11  font<'$'>  ' ## #   '
+  03de: 11 ff ff f1  font<'$'>  '  ##### '
+  03e2: 11 11 f1 ff  font<'$'>  '    # ##'
+  03e6: 1f ff ff f1  font<'$'>  ' ###### '
+  03ea: 11 1f f1 11  font<'$'>  '   ##   '
+  03ee: 11 11 11 11  font<'$'>  '        '
+  03f2: 1f f1 11 11  font<'%'>  ' ##     '
+  03f6: 1f f1 1f f1  font<'%'>  ' ##  ## '
+  03fa: 11 11 ff 11  font<'%'>  '    ##  '
+  03fe: 11 1f f1 11  font<'%'>  '   ##   '
+  0402: 11 ff 11 11  font<'%'>  '  ##    '
+  0406: 1f f1 1f f1  font<'%'>  ' ##  ## '
+  040a: 11 11 1f f1  font<'%'>  '     ## '
+  040e: 11 11 11 11  font<'%'>  '        '
+  0412: 11 ff f1 11  font<'&'>  '  ###   '
+  0416: 1f f1 ff 11  font<'&'>  ' ## ##  '
+  041a: 1f f1 ff 11  font<'&'>  ' ## ##  '
+  041e: 11 ff f1 11  font<'&'>  '  ###   '
+  0422: 1f f1 ff 1f  font<'&'>  ' ## ## #'
+  0426: 1f f1 1f f1  font<'&'>  ' ##  ## '
+  042a: 11 ff f1 ff  font<'&'>  '  ### ##'
+  042e: 11 11 11 11  font<'&'>  '        '
+  0432: 11 11 ff 11  font<"'">  '    ##  '
+  0436: 11 1f f1 11  font<"'">  '   ##   '
+  043a: 11 ff 11 11  font<"'">  '  ##    '
+  043e: 11 11 11 11  font<"'">  '        '
+  0442: 11 11 11 11  font<"'">  '        '
+  0446: 11 11 11 11  font<"'">  '        '
+  044a: 11 11 11 11  font<"'">  '        '
+  044e: 11 11 11 11  font<"'">  '        '
+  0452: 11 11 ff 11  font<'('>  '    ##  '
+  0456: 11 1f f1 11  font<'('>  '   ##   '
+  045a: 11 ff 11 11  font<'('>  '  ##    '
+  045e: 11 ff 11 11  font<'('>  '  ##    '
+  0462: 11 ff 11 11  font<'('>  '  ##    '
+  0466: 11 1f f1 11  font<'('>  '   ##   '
+  046a: 11 11 ff 11  font<'('>  '    ##  '
+  046e: 11 11 11 11  font<'('>  '        '
+  0472: 11 ff 11 11  font<')'>  '  ##    '
+  0476: 11 1f f1 11  font<')'>  '   ##   '
+  047a: 11 11 ff 11  font<')'>  '    ##  '
+  047e: 11 11 ff 11  font<')'>  '    ##  '
+  0482: 11 11 ff 11  font<')'>  '    ##  '
+  0486: 11 1f f1 11  font<')'>  '   ##   '
+  048a: 11 ff 11 11  font<')'>  '  ##    '
+  048e: 11 11 11 11  font<')'>  '        '
+  0492: 11 11 11 11  font<'*'>  '        '
+  0496: 11 1f f1 11  font<'*'>  '   ##   '
+  049a: 1f ff ff f1  font<'*'>  ' ###### '
+  049e: 11 ff ff 11  font<'*'>  '  ####  '
+  04a2: 1f ff ff f1  font<'*'>  ' ###### '
+  04a6: 11 1f f1 11  font<'*'>  '   ##   '
+  04aa: 11 11 11 11  font<'*'>  '        '
+  04ae: 11 11 11 11  font<'*'>  '        '
+  04b2: 11 11 11 11  font<'+'>  '        '
+  04b6: 11 1f f1 11  font<'+'>  '   ##   '
+  04ba: 11 1f f1 11  font<'+'>  '   ##   '
+  04be: 1f ff ff f1  font<'+'>  ' ###### '
+  04c2: 11 1f f1 11  font<'+'>  '   ##   '
+  04c6: 11 1f f1 11  font<'+'>  '   ##   '
+  04ca: 11 11 11 11  font<'+'>  '        '
+  04ce: 11 11 11 11  font<'+'>  '        '
+  04d2: 11 11 11 11  font<','>  '        '
+  04d6: 11 11 11 11  font<','>  '        '
+  04da: 11 11 11 11  font<','>  '        '
+  04de: 11 11 11 11  font<','>  '        '
+  04e2: 11 11 11 11  font<','>  '        '
+  04e6: 11 1f f1 11  font<','>  '   ##   '
+  04ea: 11 1f f1 11  font<','>  '   ##   '
+  04ee: 11 ff 11 11  font<','>  '  ##    '
+  04f2: 11 11 11 11  font<'-'>  '        '
+  04f6: 11 11 11 11  font<'-'>  '        '
+  04fa: 11 11 11 11  font<'-'>  '        '
+  04fe: 1f ff ff f1  font<'-'>  ' ###### '
+  0502: 11 11 11 11  font<'-'>  '        '
+  0506: 11 11 11 11  font<'-'>  '        '
+  050a: 11 11 11 11  font<'-'>  '        '
+  050e: 11 11 11 11  font<'-'>  '        '
+  0512: 11 11 11 11  font<'.'>  '        '
+  0516: 11 11 11 11  font<'.'>  '        '
+  051a: 11 11 11 11  font<'.'>  '        '
+  051e: 11 11 11 11  font<'.'>  '        '
+  0522: 11 11 11 11  font<'.'>  '        '
+  0526: 11 1f f1 11  font<'.'>  '   ##   '
+  052a: 11 1f f1 11  font<'.'>  '   ##   '
+  052e: 11 11 11 11  font<'.'>  '        '
+  0532: 11 11 11 11  font<'/'>  '        '
+  0536: 11 11 1f f1  font<'/'>  '     ## '
+  053a: 11 11 ff 11  font<'/'>  '    ##  '
+  053e: 11 1f f1 11  font<'/'>  '   ##   '
+  0542: 11 ff 11 11  font<'/'>  '  ##    '
+  0546: 1f f1 11 11  font<'/'>  ' ##     '
+  054a: 11 11 11 11  font<'/'>  '        '
+  054e: 11 11 11 11  font<'/'>  '        '
+  0552: 11 ff ff 11  font<'0'>  '  ####  '
+  0556: 1f f1 1f f1  font<'0'>  ' ##  ## '
+  055a: 1f f1 ff f1  font<'0'>  ' ## ### '
+  055e: 1f ff ff f1  font<'0'>  ' ###### '
+  0562: 1f ff 1f f1  font<'0'>  ' ### ## '
+  0566: 1f f1 1f f1  font<'0'>  ' ##  ## '
+  056a: 11 ff ff 11  font<'0'>  '  ####  '
+  056e: 11 11 11 11  font<'0'>  '        '
+  0572: 11 1f f1 11  font<'1'>  '   ##   '
+  0576: 11 ff f1 11  font<'1'>  '  ###   '
+  057a: 11 1f f1 11  font<'1'>  '   ##   '
+  057e: 11 1f f1 11  font<'1'>  '   ##   '
+  0582: 11 1f f1 11  font<'1'>  '   ##   '
+  0586: 11 1f f1 11  font<'1'>  '   ##   '
+  058a: 1f ff ff f1  font<'1'>  ' ###### '
+  058e: 11 11 11 11  font<'1'>  '        '
+  0592: 11 ff ff 11  font<'2'>  '  ####  '
+  0596: 1f f1 1f f1  font<'2'>  ' ##  ## '
+  059a: 11 11 1f f1  font<'2'>  '     ## '
+  059e: 11 11 ff 11  font<'2'>  '    ##  '
+  05a2: 11 1f f1 11  font<'2'>  '   ##   '
+  05a6: 11 ff 11 11  font<'2'>  '  ##    '
+  05aa: 1f ff ff f1  font<'2'>  ' ###### '
+  05ae: 11 11 11 11  font<'2'>  '        '
+  05b2: 11 ff ff 11  font<'3'>  '  ####  '
+  05b6: 1f f1 1f f1  font<'3'>  ' ##  ## '
+  05ba: 11 11 1f f1  font<'3'>  '     ## '
+  05be: 11 1f ff 11  font<'3'>  '   ###  '
+  05c2: 11 11 1f f1  font<'3'>  '     ## '
+  05c6: 1f f1 1f f1  font<'3'>  ' ##  ## '
+  05ca: 11 ff ff 11  font<'3'>  '  ####  '
+  05ce: 11 11 11 11  font<'3'>  '        '
+  05d2: 11 11 ff 11  font<'4'>  '    ##  '
+  05d6: 11 1f ff 11  font<'4'>  '   ###  '
+  05da: 11 ff ff 11  font<'4'>  '  ####  '
+  05de: 1f f1 ff 11  font<'4'>  ' ## ##  '
+  05e2: 1f ff ff f1  font<'4'>  ' ###### '
+  05e6: 11 11 ff 11  font<'4'>  '    ##  '
+  05ea: 11 11 ff 11  font<'4'>  '    ##  '
+  05ee: 11 11 11 11  font<'4'>  '        '
+  05f2: 1f ff ff f1  font<'5'>  ' ###### '
+  05f6: 1f f1 11 11  font<'5'>  ' ##     '
+  05fa: 1f ff ff 11  font<'5'>  ' #####  '
+  05fe: 11 11 1f f1  font<'5'>  '     ## '
+  0602: 11 11 1f f1  font<'5'>  '     ## '
+  0606: 1f f1 1f f1  font<'5'>  ' ##  ## '
+  060a: 11 ff ff 11  font<'5'>  '  ####  '
+  060e: 11 11 11 11  font<'5'>  '        '
+  0612: 11 1f ff 11  font<'6'>  '   ###  '
+  0616: 11 ff 11 11  font<'6'>  '  ##    '
+  061a: 1f f1 11 11  font<'6'>  ' ##     '
+  061e: 1f ff ff 11  font<'6'>  ' #####  '
+  0622: 1f f1 1f f1  font<'6'>  ' ##  ## '
+  0626: 1f f1 1f f1  font<'6'>  ' ##  ## '
+  062a: 11 ff ff 11  font<'6'>  '  ####  '
+  062e: 11 11 11 11  font<'6'>  '        '
+  0632: 1f ff ff f1  font<'7'>  ' ###### '
+  0636: 11 11 1f f1  font<'7'>  '     ## '
+  063a: 11 11 ff 11  font<'7'>  '    ##  '
+  063e: 11 1f f1 11  font<'7'>  '   ##   '
+  0642: 11 ff 11 11  font<'7'>  '  ##    '
+  0646: 11 ff 11 11  font<'7'>  '  ##    '
+  064a: 11 ff 11 11  font<'7'>  '  ##    '
+  064e: 11 11 11 11  font<'7'>  '        '
+  0652: 11 ff ff 11  font<'8'>  '  ####  '
+  0656: 1f f1 1f f1  font<'8'>  ' ##  ## '
+  065a: 1f f1 1f f1  font<'8'>  ' ##  ## '
+  065e: 11 ff ff 11  font<'8'>  '  ####  '
+  0662: 1f f1 1f f1  font<'8'>  ' ##  ## '
+  0666: 1f f1 1f f1  font<'8'>  ' ##  ## '
+  066a: 11 ff ff 11  font<'8'>  '  ####  '
+  066e: 11 11 11 11  font<'8'>  '        '
+  0672: 11 ff ff 11  font<'9'>  '  ####  '
+  0676: 1f f1 1f f1  font<'9'>  ' ##  ## '
+  067a: 1f f1 1f f1  font<'9'>  ' ##  ## '
+  067e: 11 ff ff f1  font<'9'>  '  ##### '
+  0682: 11 11 1f f1  font<'9'>  '     ## '
+  0686: 11 11 ff 11  font<'9'>  '    ##  '
+  068a: 11 ff f1 11  font<'9'>  '  ###   '
+  068e: 11 11 11 11  font<'9'>  '        '
+  0692: 11 11 11 11  font<':'>  '        '
+  0696: 11 11 11 11  font<':'>  '        '
+  069a: 11 1f f1 11  font<':'>  '   ##   '
+  069e: 11 1f f1 11  font<':'>  '   ##   '
+  06a2: 11 11 11 11  font<':'>  '        '
+  06a6: 11 1f f1 11  font<':'>  '   ##   '
+  06aa: 11 1f f1 11  font<':'>  '   ##   '
+  06ae: 11 11 11 11  font<':'>  '        '
+  06b2: 11 11 11 11  font<';'>  '        '
+  06b6: 11 11 11 11  font<';'>  '        '
+  06ba: 11 1f f1 11  font<';'>  '   ##   '
+  06be: 11 1f f1 11  font<';'>  '   ##   '
+  06c2: 11 11 11 11  font<';'>  '        '
+  06c6: 11 1f f1 11  font<';'>  '   ##   '
+  06ca: 11 1f f1 11  font<';'>  '   ##   '
+  06ce: 11 ff 11 11  font<';'>  '  ##    '
+  06d2: 11 11 ff 11  font<'<'>  '    ##  '
+  06d6: 11 1f f1 11  font<'<'>  '   ##   '
+  06da: 11 ff 11 11  font<'<'>  '  ##    '
+  06de: 1f f1 11 11  font<'<'>  ' ##     '
+  06e2: 11 ff 11 11  font<'<'>  '  ##    '
+  06e6: 11 1f f1 11  font<'<'>  '   ##   '
+  06ea: 11 11 ff 11  font<'<'>  '    ##  '
+  06ee: 11 11 11 11  font<'<'>  '        '
+  06f2: 11 11 11 11  font<'='>  '        '
+  06f6: 11 11 11 11  font<'='>  '        '
+  06fa: 1f ff ff f1  font<'='>  ' ###### '
+  06fe: 11 11 11 11  font<'='>  '        '
+  0702: 1f ff ff f1  font<'='>  ' ###### '
+  0706: 11 11 11 11  font<'='>  '        '
+  070a: 11 11 11 11  font<'='>  '        '
+  070e: 11 11 11 11  font<'='>  '        '
+  0712: 11 ff 11 11  font<'>'>  '  ##    '
+  0716: 11 1f f1 11  font<'>'>  '   ##   '
+  071a: 11 11 ff 11  font<'>'>  '    ##  '
+  071e: 11 11 1f f1  font<'>'>  '     ## '
+  0722: 11 11 ff 11  font<'>'>  '    ##  '
+  0726: 11 1f f1 11  font<'>'>  '   ##   '
+  072a: 11 ff 11 11  font<'>'>  '  ##    '
+  072e: 11 11 11 11  font<'>'>  '        '
+  0732: 11 ff ff 11  font<'?'>  '  ####  '
+  0736: 1f f1 1f f1  font<'?'>  ' ##  ## '
+  073a: 11 11 ff 11  font<'?'>  '    ##  '
+  073e: 11 1f f1 11  font<'?'>  '   ##   '
+  0742: 11 1f f1 11  font<'?'>  '   ##   '
+  0746: 11 11 11 11  font<'?'>  '        '
+  074a: 11 1f f1 11  font<'?'>  '   ##   '
+  074e: 11 11 11 11  font<'?'>  '        '
+  0752: 11 ff ff 11  font<'@'>  '  ####  '
+  0756: 1f f1 1f f1  font<'@'>  ' ##  ## '
+  075a: 1f f1 ff f1  font<'@'>  ' ## ### '
+  075e: 1f f1 f1 f1  font<'@'>  ' ## # # '
+  0762: 1f f1 ff f1  font<'@'>  ' ## ### '
+  0766: 1f f1 11 11  font<'@'>  ' ##     '
+  076a: 11 ff ff 11  font<'@'>  '  ####  '
+  076e: 11 11 11 11  font<'@'>  '        '
+  0772: 11 ff ff 11  font<'A'>  '  ####  '
+  0776: 1f f1 1f f1  font<'A'>  ' ##  ## '
+  077a: 1f f1 1f f1  font<'A'>  ' ##  ## '
+  077e: 1f ff ff f1  font<'A'>  ' ###### '
+  0782: 1f f1 1f f1  font<'A'>  ' ##  ## '
+  0786: 1f f1 1f f1  font<'A'>  ' ##  ## '
+  078a: 1f f1 1f f1  font<'A'>  ' ##  ## '
+  078e: 11 11 11 11  font<'A'>  '        '
+  0792: 1f ff ff 11  font<'B'>  ' #####  '
+  0796: 1f f1 1f f1  font<'B'>  ' ##  ## '
+  079a: 1f f1 1f f1  font<'B'>  ' ##  ## '
+  079e: 1f ff ff 11  font<'B'>  ' #####  '
+  07a2: 1f f1 1f f1  font<'B'>  ' ##  ## '
+  07a6: 1f f1 1f f1  font<'B'>  ' ##  ## '
+  07aa: 1f ff ff 11  font<'B'>  ' #####  '
+  07ae: 11 11 11 11  font<'B'>  '        '
+  07b2: 11 ff ff 11  font<'C'>  '  ####  '
+  07b6: 1f f1 1f f1  font<'C'>  ' ##  ## '
+  07ba: 1f f1 11 11  font<'C'>  ' ##     '
+  07be: 1f f1 11 11  font<'C'>  ' ##     '
+  07c2: 1f f1 11 11  font<'C'>  ' ##     '
+  07c6: 1f f1 1f f1  font<'C'>  ' ##  ## '
+  07ca: 11 ff ff 11  font<'C'>  '  ####  '
+  07ce: 11 11 11 11  font<'C'>  '        '
+  07d2: 1f ff f1 11  font<'D'>  ' ####   '
+  07d6: 1f f1 ff 11  font<'D'>  ' ## ##  '
+  07da: 1f f1 1f f1  font<'D'>  ' ##  ## '
+  07de: 1f f1 1f f1  font<'D'>  ' ##  ## '
+  07e2: 1f f1 1f f1  font<'D'>  ' ##  ## '
+  07e6: 1f f1 ff 11  font<'D'>  ' ## ##  '
+  07ea: 1f ff f1 11  font<'D'>  ' ####   '
+  07ee: 11 11 11 11  font<'D'>  '        '
+  07f2: 1f ff ff f1  font<'E'>  ' ###### '
+  07f6: 1f f1 11 11  font<'E'>  ' ##     '
+  07fa: 1f f1 11 11  font<'E'>  ' ##     '
+  07fe: 1f ff ff 11  font<'E'>  ' #####  '
+  0802: 1f f1 11 11  font<'E'>  ' ##     '
+  0806: 1f f1 11 11  font<'E'>  ' ##     '
+  080a: 1f ff ff f1  font<'E'>  ' ###### '
+  080e: 11 11 11 11  font<'E'>  '        '
+  0812: 1f ff ff f1  font<'F'>  ' ###### '
+  0816: 1f f1 11 11  font<'F'>  ' ##     '
+  081a: 1f f1 11 11  font<'F'>  ' ##     '
+  081e: 1f ff ff 11  font<'F'>  ' #####  '
+  0822: 1f f1 11 11  font<'F'>  ' ##     '
+  0826: 1f f1 11 11  font<'F'>  ' ##     '
+  082a: 1f f1 11 11  font<'F'>  ' ##     '
+  082e: 11 11 11 11  font<'F'>  '        '
+  0832: 11 ff ff 11  font<'G'>  '  ####  '
+  0836: 1f f1 1f f1  font<'G'>  ' ##  ## '
+  083a: 1f f1 11 11  font<'G'>  ' ##     '
+  083e: 1f f1 ff f1  font<'G'>  ' ## ### '
+  0842: 1f f1 1f f1  font<'G'>  ' ##  ## '
+  0846: 1f f1 1f f1  font<'G'>  ' ##  ## '
+  084a: 11 ff ff 11  font<'G'>  '  ####  '
+  084e: 11 11 11 11  font<'G'>  '        '
+  0852: 1f f1 1f f1  font<'H'>  ' ##  ## '
+  0856: 1f f1 1f f1  font<'H'>  ' ##  ## '
+  085a: 1f f1 1f f1  font<'H'>  ' ##  ## '
+  085e: 1f ff ff f1  font<'H'>  ' ###### '
+  0862: 1f f1 1f f1  font<'H'>  ' ##  ## '
+  0866: 1f f1 1f f1  font<'H'>  ' ##  ## '
+  086a: 1f f1 1f f1  font<'H'>  ' ##  ## '
+  086e: 11 11 11 11  font<'H'>  '        '
+  0872: 1f ff ff f1  font<'I'>  ' ###### '
+  0876: 11 1f f1 11  font<'I'>  '   ##   '
+  087a: 11 1f f1 11  font<'I'>  '   ##   '
+  087e: 11 1f f1 11  font<'I'>  '   ##   '
+  0882: 11 1f f1 11  font<'I'>  '   ##   '
+  0886: 11 1f f1 11  font<'I'>  '   ##   '
+  088a: 1f ff ff f1  font<'I'>  ' ###### '
+  088e: 11 11 11 11  font<'I'>  '        '
+  0892: 11 ff ff f1  font<'J'>  '  ##### '
+  0896: 11 11 ff 11  font<'J'>  '    ##  '
+  089a: 11 11 ff 11  font<'J'>  '    ##  '
+  089e: 11 11 ff 11  font<'J'>  '    ##  '
+  08a2: 11 11 ff 11  font<'J'>  '    ##  '
+  08a6: 1f f1 ff 11  font<'J'>  ' ## ##  '
+  08aa: 11 ff f1 11  font<'J'>  '  ###   '
+  08ae: 11 11 11 11  font<'J'>  '        '
+  08b2: 1f f1 1f f1  font<'K'>  ' ##  ## '
+  08b6: 1f f1 ff 11  font<'K'>  ' ## ##  '
+  08ba: 1f ff f1 11  font<'K'>  ' ####   '
+  08be: 1f ff 11 11  font<'K'>  ' ###    '
+  08c2: 1f ff f1 11  font<'K'>  ' ####   '
+  08c6: 1f f1 ff 11  font<'K'>  ' ## ##  '
+  08ca: 1f f1 1f f1  font<'K'>  ' ##  ## '
+  08ce: 11 11 11 11  font<'K'>  '        '
+  08d2: 1f f1 11 11  font<'L'>  ' ##     '
+  08d6: 1f f1 11 11  font<'L'>  ' ##     '
+  08da: 1f f1 11 11  font<'L'>  ' ##     '
+  08de: 1f f1 11 11  font<'L'>  ' ##     '
+  08e2: 1f f1 11 11  font<'L'>  ' ##     '
+  08e6: 1f f1 11 11  font<'L'>  ' ##     '
+  08ea: 1f ff ff f1  font<'L'>  ' ###### '
+  08ee: 11 11 11 11  font<'L'>  '        '
+  08f2: 1f f1 11 ff  font<'M'>  ' ##   ##'
+  08f6: 1f ff 1f ff  font<'M'>  ' ### ###'
+  08fa: 1f ff ff ff  font<'M'>  ' #######'
+  08fe: 1f f1 f1 ff  font<'M'>  ' ## # ##'
+  0902: 1f f1 f1 ff  font<'M'>  ' ## # ##'
+  0906: 1f f1 11 ff  font<'M'>  ' ##   ##'
+  090a: 1f f1 11 ff  font<'M'>  ' ##   ##'
+  090e: 11 11 11 11  font<'M'>  '        '
+  0912: 1f f1 1f f1  font<'N'>  ' ##  ## '
+  0916: 1f f1 1f f1  font<'N'>  ' ##  ## '
+  091a: 1f ff 1f f1  font<'N'>  ' ### ## '
+  091e: 1f ff ff f1  font<'N'>  ' ###### '
+  0922: 1f f1 ff f1  font<'N'>  ' ## ### '
+  0926: 1f f1 1f f1  font<'N'>  ' ##  ## '
+  092a: 1f f1 1f f1  font<'N'>  ' ##  ## '
+  092e: 11 11 11 11  font<'N'>  '        '
+  0932: 11 ff ff 11  font<'O'>  '  ####  '
+  0936: 1f f1 1f f1  font<'O'>  ' ##  ## '
+  093a: 1f f1 1f f1  font<'O'>  ' ##  ## '
+  093e: 1f f1 1f f1  font<'O'>  ' ##  ## '
+  0942: 1f f1 1f f1  font<'O'>  ' ##  ## '
+  0946: 1f f1 1f f1  font<'O'>  ' ##  ## '
+  094a: 11 ff ff 11  font<'O'>  '  ####  '
+  094e: 11 11 11 11  font<'O'>  '        '
+  0952: 1f ff ff 11  font<'P'>  ' #####  '
+  0956: 1f f1 1f f1  font<'P'>  ' ##  ## '
+  095a: 1f f1 1f f1  font<'P'>  ' ##  ## '
+  095e: 1f ff ff 11  font<'P'>  ' #####  '
+  0962: 1f f1 11 11  font<'P'>  ' ##     '
+  0966: 1f f1 11 11  font<'P'>  ' ##     '
+  096a: 1f f1 11 11  font<'P'>  ' ##     '
+  096e: 11 11 11 11  font<'P'>  '        '
+  0972: 11 ff ff 11  font<'Q'>  '  ####  '
+  0976: 1f f1 1f f1  font<'Q'>  ' ##  ## '
+  097a: 1f f1 1f f1  font<'Q'>  ' ##  ## '
+  097e: 1f f1 1f f1  font<'Q'>  ' ##  ## '
+  0982: 1f f1 f1 f1  font<'Q'>  ' ## # # '
+  0986: 1f f1 ff 11  font<'Q'>  ' ## ##  '
+  098a: 11 ff 1f f1  font<'Q'>  '  ## ## '
+  098e: 11 11 11 11  font<'Q'>  '        '
+  0992: 1f ff ff 11  font<'R'>  ' #####  '
+  0996: 1f f1 1f f1  font<'R'>  ' ##  ## '
+  099a: 1f f1 1f f1  font<'R'>  ' ##  ## '
+  099e: 1f ff ff 11  font<'R'>  ' #####  '
+  09a2: 1f f1 ff 11  font<'R'>  ' ## ##  '
+  09a6: 1f f1 1f f1  font<'R'>  ' ##  ## '
+  09aa: 1f f1 1f f1  font<'R'>  ' ##  ## '
+  09ae: 11 11 11 11  font<'R'>  '        '
+  09b2: 11 ff ff 11  font<'S'>  '  ####  '
+  09b6: 1f f1 1f f1  font<'S'>  ' ##  ## '
+  09ba: 1f f1 11 11  font<'S'>  ' ##     '
+  09be: 11 ff ff 11  font<'S'>  '  ####  '
+  09c2: 11 11 1f f1  font<'S'>  '     ## '
+  09c6: 1f f1 1f f1  font<'S'>  ' ##  ## '
+  09ca: 11 ff ff 11  font<'S'>  '  ####  '
+  09ce: 11 11 11 11  font<'S'>  '        '
+  09d2: 1f ff ff f1  font<'T'>  ' ###### '
+  09d6: 11 1f f1 11  font<'T'>  '   ##   '
+  09da: 11 1f f1 11  font<'T'>  '   ##   '
+  09de: 11 1f f1 11  font<'T'>  '   ##   '
+  09e2: 11 1f f1 11  font<'T'>  '   ##   '
+  09e6: 11 1f f1 11  font<'T'>  '   ##   '
+  09ea: 11 1f f1 11  font<'T'>  '   ##   '
+  09ee: 11 11 11 11  font<'T'>  '        '
+  09f2: 1f f1 1f f1  font<'U'>  ' ##  ## '
+  09f6: 1f f1 1f f1  font<'U'>  ' ##  ## '
+  09fa: 1f f1 1f f1  font<'U'>  ' ##  ## '
+  09fe: 1f f1 1f f1  font<'U'>  ' ##  ## '
+  0a02: 1f f1 1f f1  font<'U'>  ' ##  ## '
+  0a06: 1f f1 1f f1  font<'U'>  ' ##  ## '
+  0a0a: 11 ff ff 11  font<'U'>  '  ####  '
+  0a0e: 11 11 11 11  font<'U'>  '        '
+  0a12: 1f f1 1f f1  font<'V'>  ' ##  ## '
+  0a16: 1f f1 1f f1  font<'V'>  ' ##  ## '
+  0a1a: 1f f1 1f f1  font<'V'>  ' ##  ## '
+  0a1e: 1f f1 1f f1  font<'V'>  ' ##  ## '
+  0a22: 1f f1 1f f1  font<'V'>  ' ##  ## '
+  0a26: 11 ff ff 11  font<'V'>  '  ####  '
+  0a2a: 11 1f f1 11  font<'V'>  '   ##   '
+  0a2e: 11 11 11 11  font<'V'>  '        '
+  0a32: 1f f1 11 ff  font<'W'>  ' ##   ##'
+  0a36: 1f f1 11 ff  font<'W'>  ' ##   ##'
+  0a3a: 1f f1 f1 ff  font<'W'>  ' ## # ##'
+  0a3e: 1f f1 f1 ff  font<'W'>  ' ## # ##'
+  0a42: 1f ff ff ff  font<'W'>  ' #######'
+  0a46: 1f ff 1f ff  font<'W'>  ' ### ###'
+  0a4a: 1f f1 11 ff  font<'W'>  ' ##   ##'
+  0a4e: 11 11 11 11  font<'W'>  '        '
+  0a52: 1f f1 1f f1  font<'X'>  ' ##  ## '
+  0a56: 1f f1 1f f1  font<'X'>  ' ##  ## '
+  0a5a: 11 ff ff 11  font<'X'>  '  ####  '
+  0a5e: 11 1f f1 11  font<'X'>  '   ##   '
+  0a62: 11 ff ff 11  font<'X'>  '  ####  '
+  0a66: 1f f1 1f f1  font<'X'>  ' ##  ## '
+  0a6a: 1f f1 1f f1  font<'X'>  ' ##  ## '
+  0a6e: 11 11 11 11  font<'X'>  '        '
+  0a72: 1f f1 1f f1  font<'Y'>  ' ##  ## '
+  0a76: 1f f1 1f f1  font<'Y'>  ' ##  ## '
+  0a7a: 1f f1 1f f1  font<'Y'>  ' ##  ## '
+  0a7e: 11 ff ff 11  font<'Y'>  '  ####  '
+  0a82: 11 1f f1 11  font<'Y'>  '   ##   '
+  0a86: 11 1f f1 11  font<'Y'>  '   ##   '
+  0a8a: 11 1f f1 11  font<'Y'>  '   ##   '
+  0a8e: 11 11 11 11  font<'Y'>  '        '
+  0a92: 1f ff ff f1  font<'Z'>  ' ###### '
+  0a96: 11 11 1f f1  font<'Z'>  '     ## '
+  0a9a: 11 11 ff 11  font<'Z'>  '    ##  '
+  0a9e: 11 1f f1 11  font<'Z'>  '   ##   '
+  0aa2: 11 ff 11 11  font<'Z'>  '  ##    '
+  0aa6: 1f f1 11 11  font<'Z'>  ' ##     '
+  0aaa: 1f ff ff f1  font<'Z'>  ' ###### '
+  0aae: 11 11 11 11  font<'Z'>  '        '
+  0ab2: 1f ff ff 11  font<'['>  ' #####  '
+  0ab6: 1f f1 11 11  font<'['>  ' ##     '
+  0aba: 1f f1 11 11  font<'['>  ' ##     '
+  0abe: 1f f1 11 11  font<'['>  ' ##     '
+  0ac2: 1f f1 11 11  font<'['>  ' ##     '
+  0ac6: 1f f1 11 11  font<'['>  ' ##     '
+  0aca: 1f ff ff 11  font<'['>  ' #####  '
+  0ace: 11 11 11 11  font<'['>  '        '
+  0ad2: 11 11 11 11  font<'\\'>  '        '
+  0ad6: 1f f1 11 11  font<'\\'>  ' ##     '
+  0ada: 11 ff 11 11  font<'\\'>  '  ##    '
+  0ade: 11 1f f1 11  font<'\\'>  '   ##   '
+  0ae2: 11 11 ff 11  font<'\\'>  '    ##  '
+  0ae6: 11 11 1f f1  font<'\\'>  '     ## '
+  0aea: 11 11 11 11  font<'\\'>  '        '
+  0aee: 11 11 11 11  font<'\\'>  '        '
+  0af2: 11 ff ff f1  font<']'>  '  ##### '
+  0af6: 11 11 1f f1  font<']'>  '     ## '
+  0afa: 11 11 1f f1  font<']'>  '     ## '
+  0afe: 11 11 1f f1  font<']'>  '     ## '
+  0b02: 11 11 1f f1  font<']'>  '     ## '
+  0b06: 11 11 1f f1  font<']'>  '     ## '
+  0b0a: 11 ff ff f1  font<']'>  '  ##### '
+  0b0e: 11 11 11 11  font<']'>  '        '
+  0b12: 11 1f f1 11  font<'^'>  '   ##   '
+  0b16: 11 ff ff 11  font<'^'>  '  ####  '
+  0b1a: 1f f1 1f f1  font<'^'>  ' ##  ## '
+  0b1e: 1f 11 11 f1  font<'^'>  ' #    # '
+  0b22: 11 11 11 11  font<'^'>  '        '
+  0b26: 11 11 11 11  font<'^'>  '        '
+  0b2a: 11 11 11 11  font<'^'>  '        '
+  0b2e: 11 11 11 11  font<'^'>  '        '
+  0b32: 11 11 11 11  font<'_'>  '        '
+  0b36: 11 11 11 11  font<'_'>  '        '
+  0b3a: 11 11 11 11  font<'_'>  '        '
+  0b3e: 11 11 11 11  font<'_'>  '        '
+  0b42: 11 11 11 11  font<'_'>  '        '
+  0b46: 11 11 11 11  font<'_'>  '        '
+  0b4a: 11 11 11 11  font<'_'>  '        '
+  0b4e: ff ff ff ff  font<'_'>  '########'
+  0b52: 11 1f ff 11  font<'`'>  '   ###  '
+  0b56: 11 ff 1f f1  font<'`'>  '  ## ## '
+  0b5a: 11 ff 11 11  font<'`'>  '  ##    '
+  0b5e: 1f ff ff 11  font<'`'>  ' #####  '
+  0b62: 11 ff 11 11  font<'`'>  '  ##    '
+  0b66: 11 ff 11 11  font<'`'>  '  ##    '
+  0b6a: 1f ff ff f1  font<'`'>  ' ###### '
+  0b6e: 11 11 11 11  font<'`'>  '        '
+  0b72: 11 11 11 11  font<'a'>  '        '
+  0b76: 11 11 11 11  font<'a'>  '        '
+  0b7a: 11 ff ff 11  font<'a'>  '  ####  '
+  0b7e: 11 11 1f f1  font<'a'>  '     ## '
+  0b82: 11 ff ff f1  font<'a'>  '  ##### '
+  0b86: 1f f1 1f f1  font<'a'>  ' ##  ## '
+  0b8a: 11 ff ff f1  font<'a'>  '  ##### '
+  0b8e: 11 11 11 11  font<'a'>  '        '
+  0b92: 1f f1 11 11  font<'b'>  ' ##     '
+  0b96: 1f f1 11 11  font<'b'>  ' ##     '
+  0b9a: 1f ff ff 11  font<'b'>  ' #####  '
+  0b9e: 1f f1 1f f1  font<'b'>  ' ##  ## '
+  0ba2: 1f f1 1f f1  font<'b'>  ' ##  ## '
+  0ba6: 1f f1 1f f1  font<'b'>  ' ##  ## '
+  0baa: 1f ff ff 11  font<'b'>  ' #####  '
+  0bae: 11 11 11 11  font<'b'>  '        '
+  0bb2: 11 11 11 11  font<'c'>  '        '
+  0bb6: 11 11 11 11  font<'c'>  '        '
+  0bba: 11 ff ff 11  font<'c'>  '  ####  '
+  0bbe: 1f f1 1f f1  font<'c'>  ' ##  ## '
+  0bc2: 1f f1 11 11  font<'c'>  ' ##     '
+  0bc6: 1f f1 1f f1  font<'c'>  ' ##  ## '
+  0bca: 11 ff ff 11  font<'c'>  '  ####  '
+  0bce: 11 11 11 11  font<'c'>  '        '
+  0bd2: 11 11 1f f1  font<'d'>  '     ## '
+  0bd6: 11 11 1f f1  font<'d'>  '     ## '
+  0bda: 11 ff ff f1  font<'d'>  '  ##### '
+  0bde: 1f f1 1f f1  font<'d'>  ' ##  ## '
+  0be2: 1f f1 1f f1  font<'d'>  ' ##  ## '
+  0be6: 1f f1 1f f1  font<'d'>  ' ##  ## '
+  0bea: 11 ff ff f1  font<'d'>  '  ##### '
+  0bee: 11 11 11 11  font<'d'>  '        '
+  0bf2: 11 11 11 11  font<'e'>  '        '
+  0bf6: 11 11 11 11  font<'e'>  '        '
+  0bfa: 11 ff ff 11  font<'e'>  '  ####  '
+  0bfe: 1f f1 1f f1  font<'e'>  ' ##  ## '
+  0c02: 1f ff ff f1  font<'e'>  ' ###### '
+  0c06: 1f f1 11 11  font<'e'>  ' ##     '
+  0c0a: 11 ff ff 11  font<'e'>  '  ####  '
+  0c0e: 11 11 11 11  font<'e'>  '        '
+  0c12: 11 1f ff 11  font<'f'>  '   ###  '
+  0c16: 11 ff 11 11  font<'f'>  '  ##    '
+  0c1a: 11 ff 11 11  font<'f'>  '  ##    '
+  0c1e: 1f ff ff 11  font<'f'>  ' #####  '
+  0c22: 11 ff 11 11  font<'f'>  '  ##    '
+  0c26: 11 ff 11 11  font<'f'>  '  ##    '
+  0c2a: 11 ff 11 11  font<'f'>  '  ##    '
+  0c2e: 11 11 11 11  font<'f'>  '        '
+  0c32: 11 11 11 11  font<'g'>  '        '
+  0c36: 11 11 11 11  font<'g'>  '        '
+  0c3a: 11 ff ff f1  font<'g'>  '  ##### '
+  0c3e: 1f f1 1f f1  font<'g'>  ' ##  ## '
+  0c42: 1f f1 1f f1  font<'g'>  ' ##  ## '
+  0c46: 11 ff ff f1  font<'g'>  '  ##### '
+  0c4a: 11 11 1f f1  font<'g'>  '     ## '
+  0c4e: 11 ff ff 11  font<'g'>  '  ####  '
+  0c52: 1f f1 11 11  font<'h'>  ' ##     '
+  0c56: 1f f1 11 11  font<'h'>  ' ##     '
+  0c5a: 1f ff ff 11  font<'h'>  ' #####  '
+  0c5e: 1f f1 1f f1  font<'h'>  ' ##  ## '
+  0c62: 1f f1 1f f1  font<'h'>  ' ##  ## '
+  0c66: 1f f1 1f f1  font<'h'>  ' ##  ## '
+  0c6a: 1f f1 1f f1  font<'h'>  ' ##  ## '
+  0c6e: 11 11 11 11  font<'h'>  '        '
+  0c72: 11 1f f1 11  font<'i'>  '   ##   '
+  0c76: 11 11 11 11  font<'i'>  '        '
+  0c7a: 11 ff f1 11  font<'i'>  '  ###   '
+  0c7e: 11 1f f1 11  font<'i'>  '   ##   '
+  0c82: 11 1f f1 11  font<'i'>  '   ##   '
+  0c86: 11 1f f1 11  font<'i'>  '   ##   '
+  0c8a: 11 ff ff 11  font<'i'>  '  ####  '
+  0c8e: 11 11 11 11  font<'i'>  '        '
+  0c92: 11 1f f1 11  font<'j'>  '   ##   '
+  0c96: 11 11 11 11  font<'j'>  '        '
+  0c9a: 11 ff f1 11  font<'j'>  '  ###   '
+  0c9e: 11 1f f1 11  font<'j'>  '   ##   '
+  0ca2: 11 1f f1 11  font<'j'>  '   ##   '
+  0ca6: 11 1f f1 11  font<'j'>  '   ##   '
+  0caa: 11 1f f1 11  font<'j'>  '   ##   '
+  0cae: 1f ff 11 11  font<'j'>  ' ###    '
+  0cb2: 1f f1 11 11  font<'k'>  ' ##     '
+  0cb6: 1f f1 11 11  font<'k'>  ' ##     '
+  0cba: 1f f1 1f f1  font<'k'>  ' ##  ## '
+  0cbe: 1f f1 ff 11  font<'k'>  ' ## ##  '
+  0cc2: 1f ff f1 11  font<'k'>  ' ####   '
+  0cc6: 1f f1 ff 11  font<'k'>  ' ## ##  '
+  0cca: 1f f1 1f f1  font<'k'>  ' ##  ## '
+  0cce: 11 11 11 11  font<'k'>  '        '
+  0cd2: 11 ff f1 11  font<'l'>  '  ###   '
+  0cd6: 11 1f f1 11  font<'l'>  '   ##   '
+  0cda: 11 1f f1 11  font<'l'>  '   ##   '
+  0cde: 11 1f f1 11  font<'l'>  '   ##   '
+  0ce2: 11 1f f1 11  font<'l'>  '   ##   '
+  0ce6: 11 1f f1 11  font<'l'>  '   ##   '
+  0cea: 11 ff ff 11  font<'l'>  '  ####  '
+  0cee: 11 11 11 11  font<'l'>  '        '
+  0cf2: 11 11 11 11  font<'m'>  '        '
+  0cf6: 11 11 11 11  font<'m'>  '        '
+  0cfa: 11 ff 1f f1  font<'m'>  '  ## ## '
+  0cfe: 1f ff ff ff  font<'m'>  ' #######'
+  0d02: 1f f1 f1 ff  font<'m'>  ' ## # ##'
+  0d06: 1f f1 f1 ff  font<'m'>  ' ## # ##'
+  0d0a: 1f f1 11 ff  font<'m'>  ' ##   ##'
+  0d0e: 11 11 11 11  font<'m'>  '        '
+  0d12: 11 11 11 11  font<'n'>  '        '
+  0d16: 11 11 11 11  font<'n'>  '        '
+  0d1a: 1f ff ff 11  font<'n'>  ' #####  '
+  0d1e: 1f f1 1f f1  font<'n'>  ' ##  ## '
+  0d22: 1f f1 1f f1  font<'n'>  ' ##  ## '
+  0d26: 1f f1 1f f1  font<'n'>  ' ##  ## '
+  0d2a: 1f f1 1f f1  font<'n'>  ' ##  ## '
+  0d2e: 11 11 11 11  font<'n'>  '        '
+  0d32: 11 11 11 11  font<'o'>  '        '
+  0d36: 11 11 11 11  font<'o'>  '        '
+  0d3a: 11 ff ff 11  font<'o'>  '  ####  '
+  0d3e: 1f f1 1f f1  font<'o'>  ' ##  ## '
+  0d42: 1f f1 1f f1  font<'o'>  ' ##  ## '
+  0d46: 1f f1 1f f1  font<'o'>  ' ##  ## '
+  0d4a: 11 ff ff 11  font<'o'>  '  ####  '
+  0d4e: 11 11 11 11  font<'o'>  '        '
+  0d52: 11 11 11 11  font<'p'>  '        '
+  0d56: 11 11 11 11  font<'p'>  '        '
+  0d5a: 1f ff ff 11  font<'p'>  ' #####  '
+  0d5e: 1f f1 1f f1  font<'p'>  ' ##  ## '
+  0d62: 1f f1 1f f1  font<'p'>  ' ##  ## '
+  0d66: 1f ff ff 11  font<'p'>  ' #####  '
+  0d6a: 1f f1 11 11  font<'p'>  ' ##     '
+  0d6e: 1f f1 11 11  font<'p'>  ' ##     '
+  0d72: 11 11 11 11  font<'q'>  '        '
+  0d76: 11 11 11 11  font<'q'>  '        '
+  0d7a: 11 ff ff f1  font<'q'>  '  ##### '
+  0d7e: 1f f1 1f f1  font<'q'>  ' ##  ## '
+  0d82: 1f f1 1f f1  font<'q'>  ' ##  ## '
+  0d86: 11 ff ff f1  font<'q'>  '  ##### '
+  0d8a: 11 11 1f f1  font<'q'>  '     ## '
+  0d8e: 11 11 1f ff  font<'q'>  '     ###'
+  0d92: 11 11 11 11  font<'r'>  '        '
+  0d96: 11 11 11 11  font<'r'>  '        '
+  0d9a: 1f f1 ff 11  font<'r'>  ' ## ##  '
+  0d9e: 1f ff 1f f1  font<'r'>  ' ### ## '
+  0da2: 1f f1 11 11  font<'r'>  ' ##     '
+  0da6: 1f f1 11 11  font<'r'>  ' ##     '
+  0daa: 1f f1 11 11  font<'r'>  ' ##     '
+  0dae: 11 11 11 11  font<'r'>  '        '
+  0db2: 11 11 11 11  font<'s'>  '        '
+  0db6: 11 11 11 11  font<'s'>  '        '
+  0dba: 11 ff ff f1  font<'s'>  '  ##### '
+  0dbe: 1f f1 11 11  font<'s'>  ' ##     '
+  0dc2: 11 ff ff 11  font<'s'>  '  ####  '
+  0dc6: 11 11 1f f1  font<'s'>  '     ## '
+  0dca: 1f ff ff 11  font<'s'>  ' #####  '
+  0dce: 11 11 11 11  font<'s'>  '        '
+  0dd2: 11 ff 11 11  font<'t'>  '  ##    '
+  0dd6: 11 ff 11 11  font<'t'>  '  ##    '
+  0dda: 1f ff ff 11  font<'t'>  ' #####  '
+  0dde: 11 ff 11 11  font<'t'>  '  ##    '
+  0de2: 11 ff 11 11  font<'t'>  '  ##    '
+  0de6: 11 ff 11 11  font<'t'>  '  ##    '
+  0dea: 11 1f ff 11  font<'t'>  '   ###  '
+  0dee: 11 11 11 11  font<'t'>  '        '
+  0df2: 11 11 11 11  font<'u'>  '        '
+  0df6: 11 11 11 11  font<'u'>  '        '
+  0dfa: 1f f1 1f f1  font<'u'>  ' ##  ## '
+  0dfe: 1f f1 1f f1  font<'u'>  ' ##  ## '
+  0e02: 1f f1 1f f1  font<'u'>  ' ##  ## '
+  0e06: 1f f1 1f f1  font<'u'>  ' ##  ## '
+  0e0a: 11 ff ff f1  font<'u'>  '  ##### '
+  0e0e: 11 11 11 11  font<'u'>  '        '
+  0e12: 11 11 11 11  font<'v'>  '        '
+  0e16: 11 11 11 11  font<'v'>  '        '
+  0e1a: 1f f1 1f f1  font<'v'>  ' ##  ## '
+  0e1e: 1f f1 1f f1  font<'v'>  ' ##  ## '
+  0e22: 1f f1 1f f1  font<'v'>  ' ##  ## '
+  0e26: 11 ff ff 11  font<'v'>  '  ####  '
+  0e2a: 11 1f f1 11  font<'v'>  '   ##   '
+  0e2e: 11 11 11 11  font<'v'>  '        '
+  0e32: 11 11 11 11  font<'w'>  '        '
+  0e36: 11 11 11 11  font<'w'>  '        '
+  0e3a: 1f f1 11 ff  font<'w'>  ' ##   ##'
+  0e3e: 1f f1 f1 ff  font<'w'>  ' ## # ##'
+  0e42: 1f f1 f1 ff  font<'w'>  ' ## # ##'
+  0e46: 1f ff ff ff  font<'w'>  ' #######'
+  0e4a: 11 ff 1f f1  font<'w'>  '  ## ## '
+  0e4e: 11 11 11 11  font<'w'>  '        '
+  0e52: 11 11 11 11  font<'x'>  '        '
+  0e56: 11 11 11 11  font<'x'>  '        '
+  0e5a: 1f f1 1f f1  font<'x'>  ' ##  ## '
+  0e5e: 11 ff ff 11  font<'x'>  '  ####  '
+  0e62: 11 1f f1 11  font<'x'>  '   ##   '
+  0e66: 11 ff ff 11  font<'x'>  '  ####  '
+  0e6a: 1f f1 1f f1  font<'x'>  ' ##  ## '
+  0e6e: 11 11 11 11  font<'x'>  '        '
+  0e72: 11 11 11 11  font<'y'>  '        '
+  0e76: 11 11 11 11  font<'y'>  '        '
+  0e7a: 1f f1 1f f1  font<'y'>  ' ##  ## '
+  0e7e: 1f f1 1f f1  font<'y'>  ' ##  ## '
+  0e82: 1f f1 1f f1  font<'y'>  ' ##  ## '
+  0e86: 11 ff ff f1  font<'y'>  '  ##### '
+  0e8a: 11 11 1f f1  font<'y'>  '     ## '
+  0e8e: 11 ff ff 11  font<'y'>  '  ####  '
+  0e92: 11 11 11 11  font<'z'>  '        '
+  0e96: 11 11 11 11  font<'z'>  '        '
+  0e9a: 1f ff ff f1  font<'z'>  ' ###### '
+  0e9e: 11 11 ff 11  font<'z'>  '    ##  '
+  0ea2: 11 1f f1 11  font<'z'>  '   ##   '
+  0ea6: 11 ff 11 11  font<'z'>  '  ##    '
+  0eaa: 1f ff ff f1  font<'z'>  ' ###### '
+  0eae: 11 11 11 11  font<'z'>  '        '
+  0eb2: 11 11 ff 11  font<'{'>  '    ##  '
+  0eb6: 11 1f f1 11  font<'{'>  '   ##   '
+  0eba: 11 1f f1 11  font<'{'>  '   ##   '
+  0ebe: 1f ff 11 11  font<'{'>  ' ###    '
+  0ec2: 11 1f f1 11  font<'{'>  '   ##   '
+  0ec6: 11 1f f1 11  font<'{'>  '   ##   '
+  0eca: 11 11 ff 11  font<'{'>  '    ##  '
+  0ece: 11 11 11 11  font<'{'>  '        '
+  0ed2: 11 1f f1 11  font<'|'>  '   ##   '
+  0ed6: 11 1f f1 11  font<'|'>  '   ##   '
+  0eda: 11 1f f1 11  font<'|'>  '   ##   '
+  0ede: 11 11 11 11  font<'|'>  '        '
+  0ee2: 11 1f f1 11  font<'|'>  '   ##   '
+  0ee6: 11 1f f1 11  font<'|'>  '   ##   '
+  0eea: 11 1f f1 11  font<'|'>  '   ##   '
+  0eee: 11 11 11 11  font<'|'>  '        '
+  0ef2: 11 ff 11 11  font<'}'>  '  ##    '
+  0ef6: 11 1f f1 11  font<'}'>  '   ##   '
+  0efa: 11 1f f1 11  font<'}'>  '   ##   '
+  0efe: 11 11 ff f1  font<'}'>  '    ### '
+  0f02: 11 1f f1 11  font<'}'>  '   ##   '
+  0f06: 11 1f f1 11  font<'}'>  '   ##   '
+  0f0a: 11 ff 11 11  font<'}'>  '  ##    '
+  0f0e: 11 11 11 11  font<'}'>  '        '
+  0f12: 11 11 11 11  font<'~'>  '        '
+  0f16: 11 11 11 11  font<'~'>  '        '
+  0f1a: 11 ff 11 f1  font<'~'>  '  ##  # '
+  0f1e: 1f 11 ff 11  font<'~'>  ' #  ##  '
+  0f22: 11 11 11 11  font<'~'>  '        '
+  0f26: 11 11 11 11  font<'~'>  '        '
+  0f2a: 11 11 11 11  font<'~'>  '        '
+  0f2e: 11 11 11 11  font<'~'>  '        '
+  0f32: 11 11 11 11  font<'\x7f'>  '        '
+  0f36: 11 11 11 11  font<'\x7f'>  '        '
+  0f3a: 11 11 11 11  font<'\x7f'>  '        '
+  0f3e: 11 11 11 11  font<'\x7f'>  '        '
+  0f42: 11 11 11 11  font<'\x7f'>  '        '
+  0f46: 11 11 11 11  font<'\x7f'>  '        '
+  0f4a: 11 11 11 11  font<'\x7f'>  '        '
+  0f4e: 11 11 11 11  font<'\x7f'>  '        '
+sound_data:
+  0f52: dc 00 00 01  music<  220 Hz,   256 ms>
+  0f56: 00 00 40 01  music<    0 Hz,   320 ms>
+  0f5a: dc 00 00 01  music<  220 Hz,   256 ms>
+  0f5e: 00 00 40 01  music<    0 Hz,   320 ms>
+  0f62: 05 01 00 01  music<  261 Hz,   256 ms>
+  0f66: 00 00 40 01  music<    0 Hz,   320 ms>
+  0f6a: dc 00 00 01  music<  220 Hz,   256 ms>
+  0f6e: 00 00 40 01  music<    0 Hz,   320 ms>
+  0f72: 25 01 00 01  music<  293 Hz,   256 ms>
+  0f76: 00 00 40 01  music<    0 Hz,   320 ms>
+  0f7a: dc 00 00 01  music<  220 Hz,   256 ms>
+  0f7e: 00 00 40 01  music<    0 Hz,   320 ms>
+  0f82: 49 01 00 01  music<  329 Hz,   256 ms>
+  0f86: 00 00 40 01  music<    0 Hz,   320 ms>
+  0f8a: 25 01 00 01  music<  293 Hz,   256 ms>
+  0f8e: 00 00 40 01  music<    0 Hz,   320 ms>
+  0f92: 05 01 00 01  music<  261 Hz,   256 ms>
+  0f96: 00 00 40 01  music<    0 Hz,   320 ms>
+  0f9a: 05 01 00 01  music<  261 Hz,   256 ms>
+  0f9e: 00 00 40 01  music<    0 Hz,   320 ms>
+  0fa2: 49 01 00 01  music<  329 Hz,   256 ms>
+  0fa6: 00 00 40 01  music<    0 Hz,   320 ms>
+  0faa: 05 01 00 01  music<  261 Hz,   256 ms>
+  0fae: 00 00 40 01  music<    0 Hz,   320 ms>
+  0fb2: 87 01 00 01  music<  391 Hz,   256 ms>
+  0fb6: 00 00 40 01  music<    0 Hz,   320 ms>
+  0fba: 05 01 00 01  music<  261 Hz,   256 ms>
+  0fbe: 00 00 40 01  music<    0 Hz,   320 ms>
+  0fc2: 49 01 00 01  music<  329 Hz,   256 ms>
+  0fc6: 00 00 40 01  music<    0 Hz,   320 ms>
+  0fca: 05 01 00 01  music<  261 Hz,   256 ms>
+  0fce: 00 00 40 01  music<    0 Hz,   320 ms>
+  0fd2: c3 00 00 01  music<  195 Hz,   256 ms>
+  0fd6: 00 00 40 01  music<    0 Hz,   320 ms>
+  0fda: c3 00 00 01  music<  195 Hz,   256 ms>
+  0fde: 00 00 40 01  music<    0 Hz,   320 ms>
+  0fe2: f6 00 00 01  music<  246 Hz,   256 ms>
+  0fe6: 00 00 40 01  music<    0 Hz,   320 ms>
+  0fea: c3 00 00 01  music<  195 Hz,   256 ms>
+  0fee: 00 00 40 01  music<    0 Hz,   320 ms>
+  0ff2: 05 01 00 01  music<  261 Hz,   256 ms>
+  0ff6: 00 00 40 01  music<    0 Hz,   320 ms>
+  0ffa: c3 00 00 01  music<  195 Hz,   256 ms>
+  0ffe: 00 00 40 01  music<    0 Hz,   320 ms>
+  1002: 25 01 00 01  music<  293 Hz,   256 ms>
+  1006: 00 00 40 01  music<    0 Hz,   320 ms>
+  100a: 05 01 00 01  music<  261 Hz,   256 ms>
+  100e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1012: ae 00 00 01  music<  174 Hz,   256 ms>
+  1016: 00 00 40 01  music<    0 Hz,   320 ms>
+  101a: ae 00 00 01  music<  174 Hz,   256 ms>
+  101e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1022: dc 00 00 01  music<  220 Hz,   256 ms>
+  1026: 00 00 40 01  music<    0 Hz,   320 ms>
+  102a: ae 00 00 01  music<  174 Hz,   256 ms>
+  102e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1032: 05 01 00 01  music<  261 Hz,   256 ms>
+  1036: 00 00 40 01  music<    0 Hz,   320 ms>
+  103a: ae 00 00 01  music<  174 Hz,   256 ms>
+  103e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1042: 05 01 00 01  music<  261 Hz,   256 ms>
+  1046: 00 00 40 01  music<    0 Hz,   320 ms>
+  104a: f6 00 00 01  music<  246 Hz,   256 ms>
+  104e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1052: dc 00 00 01  music<  220 Hz,   256 ms>
+  1056: 00 00 40 01  music<    0 Hz,   320 ms>
+  105a: dc 00 00 01  music<  220 Hz,   256 ms>
+  105e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1062: 05 01 00 01  music<  261 Hz,   256 ms>
+  1066: 00 00 40 01  music<    0 Hz,   320 ms>
+  106a: dc 00 00 01  music<  220 Hz,   256 ms>
+  106e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1072: 25 01 00 01  music<  293 Hz,   256 ms>
+  1076: 00 00 40 01  music<    0 Hz,   320 ms>
+  107a: dc 00 00 01  music<  220 Hz,   256 ms>
+  107e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1082: 49 01 00 01  music<  329 Hz,   256 ms>
+  1086: 00 00 40 01  music<    0 Hz,   320 ms>
+  108a: 25 01 00 01  music<  293 Hz,   256 ms>
+  108e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1092: 05 01 00 01  music<  261 Hz,   256 ms>
+  1096: 00 00 40 01  music<    0 Hz,   320 ms>
+  109a: 05 01 00 01  music<  261 Hz,   256 ms>
+  109e: 00 00 40 01  music<    0 Hz,   320 ms>
+  10a2: 49 01 00 01  music<  329 Hz,   256 ms>
+  10a6: 00 00 40 01  music<    0 Hz,   320 ms>
+  10aa: 05 01 00 01  music<  261 Hz,   256 ms>
+  10ae: 00 00 40 01  music<    0 Hz,   320 ms>
+  10b2: 87 01 00 01  music<  391 Hz,   256 ms>
+  10b6: 00 00 40 01  music<    0 Hz,   320 ms>
+  10ba: 05 01 00 01  music<  261 Hz,   256 ms>
+  10be: 00 00 40 01  music<    0 Hz,   320 ms>
+  10c2: 49 01 00 01  music<  329 Hz,   256 ms>
+  10c6: 00 00 40 01  music<    0 Hz,   320 ms>
+  10ca: 05 01 00 01  music<  261 Hz,   256 ms>
+  10ce: 00 00 40 01  music<    0 Hz,   320 ms>
+  10d2: c3 00 00 01  music<  195 Hz,   256 ms>
+  10d6: 00 00 40 01  music<    0 Hz,   320 ms>
+  10da: c3 00 00 01  music<  195 Hz,   256 ms>
+  10de: 00 00 40 01  music<    0 Hz,   320 ms>
+  10e2: f6 00 00 01  music<  246 Hz,   256 ms>
+  10e6: 00 00 40 01  music<    0 Hz,   320 ms>
+  10ea: c3 00 00 01  music<  195 Hz,   256 ms>
+  10ee: 00 00 40 01  music<    0 Hz,   320 ms>
+  10f2: 05 01 00 01  music<  261 Hz,   256 ms>
+  10f6: 00 00 40 01  music<    0 Hz,   320 ms>
+  10fa: c3 00 00 01  music<  195 Hz,   256 ms>
+  10fe: 00 00 40 01  music<    0 Hz,   320 ms>
+  1102: 25 01 00 01  music<  293 Hz,   256 ms>
+  1106: 00 00 40 01  music<    0 Hz,   320 ms>
+  110a: 05 01 00 01  music<  261 Hz,   256 ms>
+  110e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1112: ae 00 00 01  music<  174 Hz,   256 ms>
+  1116: 00 00 40 01  music<    0 Hz,   320 ms>
+  111a: ae 00 00 01  music<  174 Hz,   256 ms>
+  111e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1122: dc 00 00 01  music<  220 Hz,   256 ms>
+  1126: 00 00 40 01  music<    0 Hz,   320 ms>
+  112a: ae 00 00 01  music<  174 Hz,   256 ms>
+  112e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1132: 05 01 00 01  music<  261 Hz,   256 ms>
+  1136: 00 00 40 01  music<    0 Hz,   320 ms>
+  113a: ae 00 00 01  music<  174 Hz,   256 ms>
+  113e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1142: 05 01 00 01  music<  261 Hz,   256 ms>
+  1146: 00 00 40 01  music<    0 Hz,   320 ms>
+  114a: f6 00 00 01  music<  246 Hz,   256 ms>
+  114e: 00 00 40 b5  music<    0 Hz, 46400 ms>
+  1152: 00 00 00 00  music<    0 Hz,     0 ms>
+  1156: 00 00 00 00  music<    0 Hz,     0 ms>
+  115a: 6e 02 34 02  music<  622 Hz,   564 ms>
+  115e: 70 03 00 00  music<  880 Hz,     0 ms>
+  1162: dc 04 00 00  music< 1244 Hz,     0 ms>
+  1166: 00 00 80 02  music<    0 Hz,   640 ms>
+  116a: 00 00 00 00  music<    0 Hz,     0 ms>
+  116e: 00 00 00 00  music<    0 Hz,     0 ms>
+  1172: 6e 02 34 02  music<  622 Hz,   564 ms>
+  1176: 70 03 00 00  music<  880 Hz,     0 ms>
+  117a: dc 04 00 00  music< 1244 Hz,     0 ms>
+  117e: 00 00 80 02  music<    0 Hz,   640 ms>
+  1182: 00 00 00 00  music<    0 Hz,     0 ms>
+  1186: 00 00 00 00  music<    0 Hz,     0 ms>
+  118a: 70 03 34 02  music<  880 Hz,   564 ms>
+  118e: 6e 02 00 00  music<  622 Hz,     0 ms>
+  1192: dc 04 00 00  music< 1244 Hz,     0 ms>
+  1196: 00 00 80 02  music<    0 Hz,   640 ms>
+  119a: 00 00 00 00  music<    0 Hz,     0 ms>
+  119e: 00 00 00 00  music<    0 Hz,     0 ms>
+  11a2: dc 04 34 02  music< 1244 Hz,   564 ms>
+  11a6: 70 03 00 00  music<  880 Hz,     0 ms>
+  11aa: 6e 02 00 00  music<  622 Hz,     0 ms>
+  11ae: 00 00 80 62  music<    0 Hz, 25216 ms>
+  11b2: dc 00 00 01  music<  220 Hz,   256 ms>
+  11b6: 00 00 40 01  music<    0 Hz,   320 ms>
+  11ba: dc 00 00 01  music<  220 Hz,   256 ms>
+  11be: 00 00 40 01  music<    0 Hz,   320 ms>
+  11c2: 05 01 00 01  music<  261 Hz,   256 ms>
+  11c6: 00 00 40 01  music<    0 Hz,   320 ms>
+  11ca: dc 00 00 01  music<  220 Hz,   256 ms>
+  11ce: 00 00 40 01  music<    0 Hz,   320 ms>
+  11d2: 25 01 00 01  music<  293 Hz,   256 ms>
+  11d6: 00 00 40 01  music<    0 Hz,   320 ms>
+  11da: dc 00 00 01  music<  220 Hz,   256 ms>
+  11de: 00 00 40 01  music<    0 Hz,   320 ms>
+  11e2: 49 01 00 01  music<  329 Hz,   256 ms>
+  11e6: 00 00 40 01  music<    0 Hz,   320 ms>
+  11ea: 25 01 00 01  music<  293 Hz,   256 ms>
+  11ee: 00 00 40 01  music<    0 Hz,   320 ms>
+  11f2: 05 01 00 01  music<  261 Hz,   256 ms>
+  11f6: 00 00 40 01  music<    0 Hz,   320 ms>
+  11fa: 05 01 00 01  music<  261 Hz,   256 ms>
+  11fe: 00 00 40 01  music<    0 Hz,   320 ms>
+  1202: 49 01 00 01  music<  329 Hz,   256 ms>
+  1206: 00 00 40 01  music<    0 Hz,   320 ms>
+  120a: 05 01 00 01  music<  261 Hz,   256 ms>
+  120e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1212: 87 01 00 01  music<  391 Hz,   256 ms>
+  1216: 00 00 40 01  music<    0 Hz,   320 ms>
+  121a: 05 01 00 01  music<  261 Hz,   256 ms>
+  121e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1222: 49 01 00 01  music<  329 Hz,   256 ms>
+  1226: 00 00 40 01  music<    0 Hz,   320 ms>
+  122a: 05 01 00 01  music<  261 Hz,   256 ms>
+  122e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1232: c3 00 00 01  music<  195 Hz,   256 ms>
+  1236: 00 00 40 01  music<    0 Hz,   320 ms>
+  123a: c3 00 00 01  music<  195 Hz,   256 ms>
+  123e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1242: f6 00 00 01  music<  246 Hz,   256 ms>
+  1246: 00 00 40 01  music<    0 Hz,   320 ms>
+  124a: c3 00 00 01  music<  195 Hz,   256 ms>
+  124e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1252: 05 01 00 01  music<  261 Hz,   256 ms>
+  1256: 00 00 40 01  music<    0 Hz,   320 ms>
+  125a: c3 00 00 01  music<  195 Hz,   256 ms>
+  125e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1262: 25 01 00 01  music<  293 Hz,   256 ms>
+  1266: 00 00 40 01  music<    0 Hz,   320 ms>
+  126a: 05 01 00 01  music<  261 Hz,   256 ms>
+  126e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1272: ae 00 00 01  music<  174 Hz,   256 ms>
+  1276: 00 00 40 01  music<    0 Hz,   320 ms>
+  127a: ae 00 00 01  music<  174 Hz,   256 ms>
+  127e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1282: dc 00 00 01  music<  220 Hz,   256 ms>
+  1286: 00 00 40 01  music<    0 Hz,   320 ms>
+  128a: ae 00 00 01  music<  174 Hz,   256 ms>
+  128e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1292: 05 01 00 01  music<  261 Hz,   256 ms>
+  1296: 00 00 40 01  music<    0 Hz,   320 ms>
+  129a: ae 00 00 01  music<  174 Hz,   256 ms>
+  129e: 00 00 40 01  music<    0 Hz,   320 ms>
+  12a2: 05 01 00 01  music<  261 Hz,   256 ms>
+  12a6: 00 00 40 01  music<    0 Hz,   320 ms>
+  12aa: f6 00 00 01  music<  246 Hz,   256 ms>
+  12ae: 00 00 40 01  music<    0 Hz,   320 ms>
+  12b2: dc 00 00 01  music<  220 Hz,   256 ms>
+  12b6: 00 00 40 01  music<    0 Hz,   320 ms>
+  12ba: dc 00 00 01  music<  220 Hz,   256 ms>
+  12be: 00 00 40 01  music<    0 Hz,   320 ms>
+  12c2: 05 01 00 01  music<  261 Hz,   256 ms>
+  12c6: 00 00 40 01  music<    0 Hz,   320 ms>
+  12ca: dc 00 00 01  music<  220 Hz,   256 ms>
+  12ce: 00 00 40 01  music<    0 Hz,   320 ms>
+  12d2: 25 01 00 01  music<  293 Hz,   256 ms>
+  12d6: 00 00 40 01  music<    0 Hz,   320 ms>
+  12da: dc 00 00 01  music<  220 Hz,   256 ms>
+  12de: 00 00 40 01  music<    0 Hz,   320 ms>
+  12e2: 49 01 00 01  music<  329 Hz,   256 ms>
+  12e6: 00 00 40 01  music<    0 Hz,   320 ms>
+  12ea: 25 01 00 01  music<  293 Hz,   256 ms>
+  12ee: 00 00 40 01  music<    0 Hz,   320 ms>
+  12f2: 05 01 00 01  music<  261 Hz,   256 ms>
+  12f6: 00 00 40 01  music<    0 Hz,   320 ms>
+  12fa: 05 01 00 01  music<  261 Hz,   256 ms>
+  12fe: 00 00 40 01  music<    0 Hz,   320 ms>
+  1302: 49 01 00 01  music<  329 Hz,   256 ms>
+  1306: 00 00 40 01  music<    0 Hz,   320 ms>
+  130a: 05 01 00 01  music<  261 Hz,   256 ms>
+  130e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1312: 87 01 00 01  music<  391 Hz,   256 ms>
+  1316: 00 00 40 01  music<    0 Hz,   320 ms>
+  131a: 05 01 00 01  music<  261 Hz,   256 ms>
+  131e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1322: 49 01 00 01  music<  329 Hz,   256 ms>
+  1326: 00 00 40 01  music<    0 Hz,   320 ms>
+  132a: 05 01 00 01  music<  261 Hz,   256 ms>
+  132e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1332: c3 00 00 01  music<  195 Hz,   256 ms>
+  1336: 00 00 40 01  music<    0 Hz,   320 ms>
+  133a: c3 00 00 01  music<  195 Hz,   256 ms>
+  133e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1342: f6 00 00 01  music<  246 Hz,   256 ms>
+  1346: 00 00 40 01  music<    0 Hz,   320 ms>
+  134a: c3 00 00 01  music<  195 Hz,   256 ms>
+  134e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1352: 05 01 00 01  music<  261 Hz,   256 ms>
+  1356: 00 00 40 01  music<    0 Hz,   320 ms>
+  135a: c3 00 00 01  music<  195 Hz,   256 ms>
+  135e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1362: 25 01 00 01  music<  293 Hz,   256 ms>
+  1366: 00 00 40 01  music<    0 Hz,   320 ms>
+  136a: 05 01 00 01  music<  261 Hz,   256 ms>
+  136e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1372: ae 00 00 01  music<  174 Hz,   256 ms>
+  1376: 00 00 40 01  music<    0 Hz,   320 ms>
+  137a: ae 00 00 01  music<  174 Hz,   256 ms>
+  137e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1382: dc 00 00 01  music<  220 Hz,   256 ms>
+  1386: 00 00 40 01  music<    0 Hz,   320 ms>
+  138a: ae 00 00 01  music<  174 Hz,   256 ms>
+  138e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1392: 05 01 00 01  music<  261 Hz,   256 ms>
+  1396: 00 00 40 01  music<    0 Hz,   320 ms>
+  139a: ae 00 00 01  music<  174 Hz,   256 ms>
+  139e: 00 00 40 01  music<    0 Hz,   320 ms>
+  13a2: 05 01 00 01  music<  261 Hz,   256 ms>
+  13a6: 00 00 40 01  music<    0 Hz,   320 ms>
+  13aa: f6 00 00 01  music<  246 Hz,   256 ms>
+  13ae: 00 00 00 63  music<    0 Hz, 25344 ms>
+  13b2: 70 03 70 01  music<  880 Hz,   368 ms>
+  13b6: 00 00 a0 01  music<    0 Hz,   416 ms>
+  13ba: 0f 03 70 01  music<  783 Hz,   368 ms>
+  13be: 00 00 a0 01  music<    0 Hz,   416 ms>
+  13c2: ba 02 70 01  music<  698 Hz,   368 ms>
+  13c6: 00 00 a0 01  music<    0 Hz,   416 ms>
+  13ca: 93 02 70 01  music<  659 Hz,   368 ms>
+  13ce: 00 00 a0 01  music<    0 Hz,   416 ms>
+  13d2: 4b 02 48 01  music<  587 Hz,   328 ms>
+  13d6: 00 00 80 02  music<    0 Hz,   640 ms>
+  13da: 70 03 70 01  music<  880 Hz,   368 ms>
+  13de: 00 00 a0 01  music<    0 Hz,   416 ms>
+  13e2: 0f 03 70 01  music<  783 Hz,   368 ms>
+  13e6: 00 00 a0 01  music<    0 Hz,   416 ms>
+  13ea: ba 02 70 01  music<  698 Hz,   368 ms>
+  13ee: 00 00 a0 01  music<    0 Hz,   416 ms>
+  13f2: 93 02 70 01  music<  659 Hz,   368 ms>
+  13f6: 00 00 a0 01  music<    0 Hz,   416 ms>
+  13fa: 4b 02 48 01  music<  587 Hz,   328 ms>
+  13fe: 00 00 80 02  music<    0 Hz,   640 ms>
+  1402: 70 03 70 01  music<  880 Hz,   368 ms>
+  1406: 00 00 a0 01  music<    0 Hz,   416 ms>
+  140a: 0f 03 70 01  music<  783 Hz,   368 ms>
+  140e: 00 00 a0 01  music<    0 Hz,   416 ms>
+  1412: ba 02 70 01  music<  698 Hz,   368 ms>
+  1416: 00 00 a0 01  music<    0 Hz,   416 ms>
+  141a: 93 02 70 01  music<  659 Hz,   368 ms>
+  141e: 00 00 a0 01  music<    0 Hz,   416 ms>
+  1422: 4b 02 48 01  music<  587 Hz,   328 ms>
+  1426: 00 00 80 02  music<    0 Hz,   640 ms>
+  142a: 93 02 70 01  music<  659 Hz,   368 ms>
+  142e: 00 00 a0 01  music<    0 Hz,   416 ms>
+  1432: 4b 02 70 01  music<  587 Hz,   368 ms>
+  1436: 00 00 a0 01  music<    0 Hz,   416 ms>
+  143a: 0b 02 70 01  music<  523 Hz,   368 ms>
+  143e: 00 00 a0 01  music<    0 Hz,   416 ms>
+  1442: ed 01 70 01  music<  493 Hz,   368 ms>
+  1446: 00 00 a0 01  music<    0 Hz,   416 ms>
+  144a: b8 01 48 01  music<  440 Hz,   328 ms>
+  144e: 00 00 80 02  music<    0 Hz,   640 ms>
+  1452: 70 03 70 01  music<  880 Hz,   368 ms>
+  1456: 00 00 a0 01  music<    0 Hz,   416 ms>
+  145a: 0f 03 70 01  music<  783 Hz,   368 ms>
+  145e: 00 00 a0 01  music<    0 Hz,   416 ms>
+  1462: ba 02 70 01  music<  698 Hz,   368 ms>
+  1466: 00 00 a0 01  music<    0 Hz,   416 ms>
+  146a: 93 02 70 01  music<  659 Hz,   368 ms>
+  146e: 00 00 a0 01  music<    0 Hz,   416 ms>
+  1472: 4b 02 48 01  music<  587 Hz,   328 ms>
+  1476: 00 00 80 02  music<    0 Hz,   640 ms>
+  147a: 70 03 70 01  music<  880 Hz,   368 ms>
+  147e: 00 00 a0 01  music<    0 Hz,   416 ms>
+  1482: 0f 03 70 01  music<  783 Hz,   368 ms>
+  1486: 00 00 a0 01  music<    0 Hz,   416 ms>
+  148a: ba 02 70 01  music<  698 Hz,   368 ms>
+  148e: 00 00 a0 01  music<    0 Hz,   416 ms>
+  1492: 93 02 70 01  music<  659 Hz,   368 ms>
+  1496: 00 00 a0 01  music<    0 Hz,   416 ms>
+  149a: 4b 02 48 01  music<  587 Hz,   328 ms>
+  149e: 00 00 80 02  music<    0 Hz,   640 ms>
+  14a2: 70 03 70 01  music<  880 Hz,   368 ms>
+  14a6: 00 00 a0 01  music<    0 Hz,   416 ms>
+  14aa: 0f 03 70 01  music<  783 Hz,   368 ms>
+  14ae: 00 00 a0 01  music<    0 Hz,   416 ms>
+  14b2: ba 02 70 01  music<  698 Hz,   368 ms>
+  14b6: 00 00 a0 01  music<    0 Hz,   416 ms>
+  14ba: 93 02 70 01  music<  659 Hz,   368 ms>
+  14be: 00 00 a0 01  music<    0 Hz,   416 ms>
+  14c2: 4b 02 48 01  music<  587 Hz,   328 ms>
+  14c6: 00 00 80 02  music<    0 Hz,   640 ms>
+  14ca: 93 02 70 01  music<  659 Hz,   368 ms>
+  14ce: 00 00 a0 01  music<    0 Hz,   416 ms>
+  14d2: 4b 02 70 01  music<  587 Hz,   368 ms>
+  14d6: 00 00 a0 01  music<    0 Hz,   416 ms>
+  14da: 0b 02 70 01  music<  523 Hz,   368 ms>
+  14de: 00 00 a0 01  music<    0 Hz,   416 ms>
+  14e2: ed 01 70 01  music<  493 Hz,   368 ms>
+  14e6: 00 00 a0 01  music<    0 Hz,   416 ms>
+  14ea: 00 00 40 01  music<    0 Hz,   320 ms>
+  14ee: b8 01 08 00  music<  440 Hz,     8 ms>
+  14f2: dc 00 78 00  music<  220 Hz,   120 ms>
+  14f6: 00 00 c0 00  music<    0 Hz,   192 ms>
+  14fa: dc 00 00 01  music<  220 Hz,   256 ms>
+  14fe: 00 00 40 01  music<    0 Hz,   320 ms>
+  1502: 05 01 00 01  music<  261 Hz,   256 ms>
+  1506: 00 00 40 01  music<    0 Hz,   320 ms>
+  150a: dc 00 00 01  music<  220 Hz,   256 ms>
+  150e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1512: 25 01 00 01  music<  293 Hz,   256 ms>
+  1516: 00 00 40 01  music<    0 Hz,   320 ms>
+  151a: dc 00 00 01  music<  220 Hz,   256 ms>
+  151e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1522: 49 01 00 01  music<  329 Hz,   256 ms>
+  1526: 00 00 40 01  music<    0 Hz,   320 ms>
+  152a: 25 01 00 01  music<  293 Hz,   256 ms>
+  152e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1532: 05 01 00 01  music<  261 Hz,   256 ms>
+  1536: 00 00 40 01  music<    0 Hz,   320 ms>
+  153a: 05 01 00 01  music<  261 Hz,   256 ms>
+  153e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1542: 49 01 00 01  music<  329 Hz,   256 ms>
+  1546: 00 00 40 01  music<    0 Hz,   320 ms>
+  154a: 05 01 00 01  music<  261 Hz,   256 ms>
+  154e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1552: 87 01 00 01  music<  391 Hz,   256 ms>
+  1556: 00 00 40 01  music<    0 Hz,   320 ms>
+  155a: 05 01 00 01  music<  261 Hz,   256 ms>
+  155e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1562: 49 01 00 01  music<  329 Hz,   256 ms>
+  1566: 00 00 40 01  music<    0 Hz,   320 ms>
+  156a: 05 01 00 01  music<  261 Hz,   256 ms>
+  156e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1572: c3 00 00 01  music<  195 Hz,   256 ms>
+  1576: 00 00 40 01  music<    0 Hz,   320 ms>
+  157a: c3 00 00 01  music<  195 Hz,   256 ms>
+  157e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1582: f6 00 00 01  music<  246 Hz,   256 ms>
+  1586: 00 00 40 01  music<    0 Hz,   320 ms>
+  158a: c3 00 00 01  music<  195 Hz,   256 ms>
+  158e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1592: 05 01 00 01  music<  261 Hz,   256 ms>
+  1596: 00 00 40 01  music<    0 Hz,   320 ms>
+  159a: c3 00 00 01  music<  195 Hz,   256 ms>
+  159e: 00 00 40 01  music<    0 Hz,   320 ms>
+  15a2: 25 01 00 01  music<  293 Hz,   256 ms>
+  15a6: 00 00 40 01  music<    0 Hz,   320 ms>
+  15aa: 05 01 00 01  music<  261 Hz,   256 ms>
+  15ae: 00 00 40 01  music<    0 Hz,   320 ms>
+  15b2: ae 00 00 01  music<  174 Hz,   256 ms>
+  15b6: 00 00 40 01  music<    0 Hz,   320 ms>
+  15ba: ae 00 00 01  music<  174 Hz,   256 ms>
+  15be: 00 00 40 01  music<    0 Hz,   320 ms>
+  15c2: dc 00 00 01  music<  220 Hz,   256 ms>
+  15c6: 00 00 40 01  music<    0 Hz,   320 ms>
+  15ca: ae 00 00 01  music<  174 Hz,   256 ms>
+  15ce: 00 00 40 01  music<    0 Hz,   320 ms>
+  15d2: 05 01 00 01  music<  261 Hz,   256 ms>
+  15d6: 00 00 40 01  music<    0 Hz,   320 ms>
+  15da: ae 00 00 01  music<  174 Hz,   256 ms>
+  15de: 00 00 40 01  music<    0 Hz,   320 ms>
+  15e2: 05 01 00 01  music<  261 Hz,   256 ms>
+  15e6: 00 00 40 01  music<    0 Hz,   320 ms>
+  15ea: f6 00 00 01  music<  246 Hz,   256 ms>
+  15ee: 00 00 40 01  music<    0 Hz,   320 ms>
+  15f2: dc 00 00 01  music<  220 Hz,   256 ms>
+  15f6: 00 00 40 01  music<    0 Hz,   320 ms>
+  15fa: dc 00 00 01  music<  220 Hz,   256 ms>
+  15fe: 00 00 40 01  music<    0 Hz,   320 ms>
+  1602: 05 01 00 01  music<  261 Hz,   256 ms>
+  1606: 00 00 40 01  music<    0 Hz,   320 ms>
+  160a: dc 00 00 01  music<  220 Hz,   256 ms>
+  160e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1612: 25 01 00 01  music<  293 Hz,   256 ms>
+  1616: 00 00 40 01  music<    0 Hz,   320 ms>
+  161a: dc 00 00 01  music<  220 Hz,   256 ms>
+  161e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1622: 49 01 00 01  music<  329 Hz,   256 ms>
+  1626: 00 00 40 01  music<    0 Hz,   320 ms>
+  162a: 25 01 00 01  music<  293 Hz,   256 ms>
+  162e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1632: 05 01 00 01  music<  261 Hz,   256 ms>
+  1636: 00 00 40 01  music<    0 Hz,   320 ms>
+  163a: 05 01 00 01  music<  261 Hz,   256 ms>
+  163e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1642: 49 01 00 01  music<  329 Hz,   256 ms>
+  1646: 00 00 40 01  music<    0 Hz,   320 ms>
+  164a: 05 01 00 01  music<  261 Hz,   256 ms>
+  164e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1652: 87 01 00 01  music<  391 Hz,   256 ms>
+  1656: 00 00 40 01  music<    0 Hz,   320 ms>
+  165a: 05 01 00 01  music<  261 Hz,   256 ms>
+  165e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1662: 49 01 00 01  music<  329 Hz,   256 ms>
+  1666: 00 00 40 01  music<    0 Hz,   320 ms>
+  166a: 05 01 00 01  music<  261 Hz,   256 ms>
+  166e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1672: c3 00 00 01  music<  195 Hz,   256 ms>
+  1676: 00 00 40 01  music<    0 Hz,   320 ms>
+  167a: c3 00 00 01  music<  195 Hz,   256 ms>
+  167e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1682: f6 00 00 01  music<  246 Hz,   256 ms>
+  1686: 00 00 40 01  music<    0 Hz,   320 ms>
+  168a: c3 00 00 01  music<  195 Hz,   256 ms>
+  168e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1692: 05 01 00 01  music<  261 Hz,   256 ms>
+  1696: 00 00 40 01  music<    0 Hz,   320 ms>
+  169a: c3 00 00 01  music<  195 Hz,   256 ms>
+  169e: 00 00 40 01  music<    0 Hz,   320 ms>
+  16a2: 25 01 00 01  music<  293 Hz,   256 ms>
+  16a6: 00 00 40 01  music<    0 Hz,   320 ms>
+  16aa: 05 01 00 01  music<  261 Hz,   256 ms>
+  16ae: 00 00 40 01  music<    0 Hz,   320 ms>
+  16b2: ae 00 00 01  music<  174 Hz,   256 ms>
+  16b6: 00 00 40 01  music<    0 Hz,   320 ms>
+  16ba: ae 00 00 01  music<  174 Hz,   256 ms>
+  16be: 00 00 40 01  music<    0 Hz,   320 ms>
+  16c2: dc 00 00 01  music<  220 Hz,   256 ms>
+  16c6: 00 00 40 01  music<    0 Hz,   320 ms>
+  16ca: ae 00 00 01  music<  174 Hz,   256 ms>
+  16ce: 00 00 40 01  music<    0 Hz,   320 ms>
+  16d2: 05 01 00 01  music<  261 Hz,   256 ms>
+  16d6: 00 00 40 01  music<    0 Hz,   320 ms>
+  16da: ae 00 00 01  music<  174 Hz,   256 ms>
+  16de: 00 00 40 01  music<    0 Hz,   320 ms>
+  16e2: 05 01 00 01  music<  261 Hz,   256 ms>
+  16e6: 00 00 40 01  music<    0 Hz,   320 ms>
+  16ea: f6 00 00 01  music<  246 Hz,   256 ms>
+  16ee: 00 00 40 55  music<    0 Hz, 21824 ms>
+  16f2: 00 00 00 00  music<    0 Hz,     0 ms>
+  16f6: 00 00 00 00  music<    0 Hz,     0 ms>
+  16fa: 6e 02 34 02  music<  622 Hz,   564 ms>
+  16fe: 70 03 00 00  music<  880 Hz,     0 ms>
+  1702: dc 04 00 00  music< 1244 Hz,     0 ms>
+  1706: 00 00 80 02  music<    0 Hz,   640 ms>
+  170a: 00 00 00 00  music<    0 Hz,     0 ms>
+  170e: 00 00 00 00  music<    0 Hz,     0 ms>
+  1712: 6e 02 34 02  music<  622 Hz,   564 ms>
+  1716: 70 03 00 00  music<  880 Hz,     0 ms>
+  171a: dc 04 00 00  music< 1244 Hz,     0 ms>
+  171e: 00 00 80 02  music<    0 Hz,   640 ms>
+  1722: 00 00 00 00  music<    0 Hz,     0 ms>
+  1726: 00 00 00 00  music<    0 Hz,     0 ms>
+  172a: 70 03 34 02  music<  880 Hz,   564 ms>
+  172e: 6e 02 00 00  music<  622 Hz,     0 ms>
+  1732: dc 04 00 00  music< 1244 Hz,     0 ms>
+  1736: 00 00 80 02  music<    0 Hz,   640 ms>
+  173a: 00 00 00 00  music<    0 Hz,     0 ms>
+  173e: 00 00 00 00  music<    0 Hz,     0 ms>
+  1742: dc 04 34 02  music< 1244 Hz,   564 ms>
+  1746: 70 03 00 00  music<  880 Hz,     0 ms>
+  174a: 6e 02 00 00  music<  622 Hz,     0 ms>
+  174e: 00 00 40 04  music<    0 Hz,  1088 ms>
+  1752: 70 03 70 01  music<  880 Hz,   368 ms>
+  1756: 00 00 a0 01  music<    0 Hz,   416 ms>
+  175a: 0f 03 70 01  music<  783 Hz,   368 ms>
+  175e: 00 00 a0 01  music<    0 Hz,   416 ms>
+  1762: ba 02 70 01  music<  698 Hz,   368 ms>
+  1766: 00 00 a0 01  music<    0 Hz,   416 ms>
+  176a: 93 02 70 01  music<  659 Hz,   368 ms>
+  176e: 00 00 a0 01  music<    0 Hz,   416 ms>
+  1772: 4b 02 48 01  music<  587 Hz,   328 ms>
+  1776: 00 00 80 02  music<    0 Hz,   640 ms>
+  177a: 70 03 70 01  music<  880 Hz,   368 ms>
+  177e: 00 00 a0 01  music<    0 Hz,   416 ms>
+  1782: 0f 03 70 01  music<  783 Hz,   368 ms>
+  1786: 00 00 a0 01  music<    0 Hz,   416 ms>
+  178a: ba 02 70 01  music<  698 Hz,   368 ms>
+  178e: 00 00 a0 01  music<    0 Hz,   416 ms>
+  1792: 93 02 70 01  music<  659 Hz,   368 ms>
+  1796: 00 00 a0 01  music<    0 Hz,   416 ms>
+  179a: 4b 02 48 01  music<  587 Hz,   328 ms>
+  179e: 00 00 80 02  music<    0 Hz,   640 ms>
+  17a2: 70 03 70 01  music<  880 Hz,   368 ms>
+  17a6: 00 00 a0 01  music<    0 Hz,   416 ms>
+  17aa: 0f 03 70 01  music<  783 Hz,   368 ms>
+  17ae: 00 00 a0 01  music<    0 Hz,   416 ms>
+  17b2: ba 02 70 01  music<  698 Hz,   368 ms>
+  17b6: 00 00 a0 01  music<    0 Hz,   416 ms>
+  17ba: 93 02 70 01  music<  659 Hz,   368 ms>
+  17be: 00 00 a0 01  music<    0 Hz,   416 ms>
+  17c2: 4b 02 48 01  music<  587 Hz,   328 ms>
+  17c6: 00 00 80 02  music<    0 Hz,   640 ms>
+  17ca: 93 02 70 01  music<  659 Hz,   368 ms>
+  17ce: 00 00 a0 01  music<    0 Hz,   416 ms>
+  17d2: 4b 02 70 01  music<  587 Hz,   368 ms>
+  17d6: 00 00 a0 01  music<    0 Hz,   416 ms>
+  17da: 0b 02 70 01  music<  523 Hz,   368 ms>
+  17de: 00 00 a0 01  music<    0 Hz,   416 ms>
+  17e2: ed 01 70 01  music<  493 Hz,   368 ms>
+  17e6: 00 00 a0 01  music<    0 Hz,   416 ms>
+  17ea: b8 01 48 01  music<  440 Hz,   328 ms>
+  17ee: 00 00 80 02  music<    0 Hz,   640 ms>
+  17f2: 70 03 70 01  music<  880 Hz,   368 ms>
+  17f6: 00 00 a0 01  music<    0 Hz,   416 ms>
+  17fa: 0f 03 70 01  music<  783 Hz,   368 ms>
+  17fe: 00 00 a0 01  music<    0 Hz,   416 ms>
+  1802: ba 02 70 01  music<  698 Hz,   368 ms>
+  1806: 00 00 a0 01  music<    0 Hz,   416 ms>
+  180a: 93 02 70 01  music<  659 Hz,   368 ms>
+  180e: 00 00 a0 01  music<    0 Hz,   416 ms>
+  1812: 4b 02 48 01  music<  587 Hz,   328 ms>
+  1816: 00 00 80 02  music<    0 Hz,   640 ms>
+  181a: 70 03 70 01  music<  880 Hz,   368 ms>
+  181e: 00 00 a0 01  music<    0 Hz,   416 ms>
+  1822: 0f 03 70 01  music<  783 Hz,   368 ms>
+  1826: 00 00 a0 01  music<    0 Hz,   416 ms>
+  182a: ba 02 70 01  music<  698 Hz,   368 ms>
+  182e: 00 00 a0 01  music<    0 Hz,   416 ms>
+  1832: 93 02 70 01  music<  659 Hz,   368 ms>
+  1836: 00 00 a0 01  music<    0 Hz,   416 ms>
+  183a: 4b 02 48 01  music<  587 Hz,   328 ms>
+  183e: 00 00 80 02  music<    0 Hz,   640 ms>
+  1842: 70 03 70 01  music<  880 Hz,   368 ms>
+  1846: 00 00 a0 01  music<    0 Hz,   416 ms>
+  184a: 0f 03 70 01  music<  783 Hz,   368 ms>
+  184e: 00 00 a0 01  music<    0 Hz,   416 ms>
+  1852: ba 02 70 01  music<  698 Hz,   368 ms>
+  1856: 00 00 a0 01  music<    0 Hz,   416 ms>
+  185a: 93 02 70 01  music<  659 Hz,   368 ms>
+  185e: 00 00 a0 01  music<    0 Hz,   416 ms>
+  1862: 4b 02 48 01  music<  587 Hz,   328 ms>
+  1866: 00 00 80 02  music<    0 Hz,   640 ms>
+  186a: 93 02 70 01  music<  659 Hz,   368 ms>
+  186e: 00 00 a0 01  music<    0 Hz,   416 ms>
+  1872: 4b 02 70 01  music<  587 Hz,   368 ms>
+  1876: 00 00 a0 01  music<    0 Hz,   416 ms>
+  187a: 0b 02 70 01  music<  523 Hz,   368 ms>
+  187e: 00 00 a0 01  music<    0 Hz,   416 ms>
+  1882: ed 01 70 01  music<  493 Hz,   368 ms>
+  1886: 00 00 a0 01  music<    0 Hz,   416 ms>
+  188a: 00 00 40 01  music<    0 Hz,   320 ms>
+  188e: b8 01 08 00  music<  440 Hz,     8 ms>
+  1892: dc 00 78 00  music<  220 Hz,   120 ms>
+  1896: 00 00 c0 00  music<    0 Hz,   192 ms>
+  189a: dc 00 00 01  music<  220 Hz,   256 ms>
+  189e: 00 00 40 01  music<    0 Hz,   320 ms>
+  18a2: 05 01 00 01  music<  261 Hz,   256 ms>
+  18a6: 00 00 40 01  music<    0 Hz,   320 ms>
+  18aa: dc 00 00 01  music<  220 Hz,   256 ms>
+  18ae: 00 00 40 01  music<    0 Hz,   320 ms>
+  18b2: 25 01 00 01  music<  293 Hz,   256 ms>
+  18b6: 00 00 40 01  music<    0 Hz,   320 ms>
+  18ba: dc 00 00 01  music<  220 Hz,   256 ms>
+  18be: 00 00 40 01  music<    0 Hz,   320 ms>
+  18c2: 49 01 00 01  music<  329 Hz,   256 ms>
+  18c6: 00 00 40 01  music<    0 Hz,   320 ms>
+  18ca: 25 01 00 01  music<  293 Hz,   256 ms>
+  18ce: 00 00 40 01  music<    0 Hz,   320 ms>
+  18d2: 05 01 00 01  music<  261 Hz,   256 ms>
+  18d6: 00 00 40 01  music<    0 Hz,   320 ms>
+  18da: 05 01 00 01  music<  261 Hz,   256 ms>
+  18de: 00 00 40 01  music<    0 Hz,   320 ms>
+  18e2: 49 01 00 01  music<  329 Hz,   256 ms>
+  18e6: 00 00 40 01  music<    0 Hz,   320 ms>
+  18ea: 05 01 00 01  music<  261 Hz,   256 ms>
+  18ee: 00 00 40 01  music<    0 Hz,   320 ms>
+  18f2: 87 01 00 01  music<  391 Hz,   256 ms>
+  18f6: 00 00 40 01  music<    0 Hz,   320 ms>
+  18fa: 05 01 00 01  music<  261 Hz,   256 ms>
+  18fe: 00 00 40 01  music<    0 Hz,   320 ms>
+  1902: 49 01 00 01  music<  329 Hz,   256 ms>
+  1906: 00 00 40 01  music<    0 Hz,   320 ms>
+  190a: 05 01 00 01  music<  261 Hz,   256 ms>
+  190e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1912: c3 00 00 01  music<  195 Hz,   256 ms>
+  1916: 00 00 40 01  music<    0 Hz,   320 ms>
+  191a: c3 00 00 01  music<  195 Hz,   256 ms>
+  191e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1922: f6 00 00 01  music<  246 Hz,   256 ms>
+  1926: 00 00 40 01  music<    0 Hz,   320 ms>
+  192a: c3 00 00 01  music<  195 Hz,   256 ms>
+  192e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1932: 05 01 00 01  music<  261 Hz,   256 ms>
+  1936: 00 00 40 01  music<    0 Hz,   320 ms>
+  193a: c3 00 00 01  music<  195 Hz,   256 ms>
+  193e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1942: 25 01 00 01  music<  293 Hz,   256 ms>
+  1946: 00 00 40 01  music<    0 Hz,   320 ms>
+  194a: 05 01 00 01  music<  261 Hz,   256 ms>
+  194e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1952: ae 00 00 01  music<  174 Hz,   256 ms>
+  1956: 00 00 40 01  music<    0 Hz,   320 ms>
+  195a: ae 00 00 01  music<  174 Hz,   256 ms>
+  195e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1962: dc 00 00 01  music<  220 Hz,   256 ms>
+  1966: 00 00 40 01  music<    0 Hz,   320 ms>
+  196a: ae 00 00 01  music<  174 Hz,   256 ms>
+  196e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1972: 05 01 00 01  music<  261 Hz,   256 ms>
+  1976: 00 00 40 01  music<    0 Hz,   320 ms>
+  197a: ae 00 00 01  music<  174 Hz,   256 ms>
+  197e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1982: 05 01 00 01  music<  261 Hz,   256 ms>
+  1986: 00 00 40 01  music<    0 Hz,   320 ms>
+  198a: f6 00 00 01  music<  246 Hz,   256 ms>
+  198e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1992: dc 00 00 01  music<  220 Hz,   256 ms>
+  1996: 00 00 40 01  music<    0 Hz,   320 ms>
+  199a: dc 00 00 01  music<  220 Hz,   256 ms>
+  199e: 00 00 40 01  music<    0 Hz,   320 ms>
+  19a2: 05 01 00 01  music<  261 Hz,   256 ms>
+  19a6: 00 00 40 01  music<    0 Hz,   320 ms>
+  19aa: dc 00 00 01  music<  220 Hz,   256 ms>
+  19ae: 00 00 40 01  music<    0 Hz,   320 ms>
+  19b2: 25 01 00 01  music<  293 Hz,   256 ms>
+  19b6: 00 00 40 01  music<    0 Hz,   320 ms>
+  19ba: dc 00 00 01  music<  220 Hz,   256 ms>
+  19be: 00 00 40 01  music<    0 Hz,   320 ms>
+  19c2: 49 01 00 01  music<  329 Hz,   256 ms>
+  19c6: 00 00 40 01  music<    0 Hz,   320 ms>
+  19ca: 25 01 00 01  music<  293 Hz,   256 ms>
+  19ce: 00 00 40 01  music<    0 Hz,   320 ms>
+  19d2: 05 01 00 01  music<  261 Hz,   256 ms>
+  19d6: 00 00 40 01  music<    0 Hz,   320 ms>
+  19da: 05 01 00 01  music<  261 Hz,   256 ms>
+  19de: 00 00 40 01  music<    0 Hz,   320 ms>
+  19e2: 49 01 00 01  music<  329 Hz,   256 ms>
+  19e6: 00 00 40 01  music<    0 Hz,   320 ms>
+  19ea: 05 01 00 01  music<  261 Hz,   256 ms>
+  19ee: 00 00 40 01  music<    0 Hz,   320 ms>
+  19f2: 87 01 00 01  music<  391 Hz,   256 ms>
+  19f6: 00 00 40 01  music<    0 Hz,   320 ms>
+  19fa: 05 01 00 01  music<  261 Hz,   256 ms>
+  19fe: 00 00 40 01  music<    0 Hz,   320 ms>
+  1a02: 49 01 00 01  music<  329 Hz,   256 ms>
+  1a06: 00 00 40 01  music<    0 Hz,   320 ms>
+  1a0a: 05 01 00 01  music<  261 Hz,   256 ms>
+  1a0e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1a12: c3 00 00 01  music<  195 Hz,   256 ms>
+  1a16: 00 00 40 01  music<    0 Hz,   320 ms>
+  1a1a: c3 00 00 01  music<  195 Hz,   256 ms>
+  1a1e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1a22: f6 00 00 01  music<  246 Hz,   256 ms>
+  1a26: 00 00 40 01  music<    0 Hz,   320 ms>
+  1a2a: c3 00 00 01  music<  195 Hz,   256 ms>
+  1a2e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1a32: 05 01 00 01  music<  261 Hz,   256 ms>
+  1a36: 00 00 40 01  music<    0 Hz,   320 ms>
+  1a3a: c3 00 00 01  music<  195 Hz,   256 ms>
+  1a3e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1a42: 25 01 00 01  music<  293 Hz,   256 ms>
+  1a46: 00 00 40 01  music<    0 Hz,   320 ms>
+  1a4a: 05 01 00 01  music<  261 Hz,   256 ms>
+  1a4e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1a52: ae 00 00 01  music<  174 Hz,   256 ms>
+  1a56: 00 00 40 01  music<    0 Hz,   320 ms>
+  1a5a: ae 00 00 01  music<  174 Hz,   256 ms>
+  1a5e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1a62: dc 00 00 01  music<  220 Hz,   256 ms>
+  1a66: 00 00 40 01  music<    0 Hz,   320 ms>
+  1a6a: ae 00 00 01  music<  174 Hz,   256 ms>
+  1a6e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1a72: 05 01 00 01  music<  261 Hz,   256 ms>
+  1a76: 00 00 40 01  music<    0 Hz,   320 ms>
+  1a7a: ae 00 00 01  music<  174 Hz,   256 ms>
+  1a7e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1a82: 05 01 00 01  music<  261 Hz,   256 ms>
+  1a86: 00 00 40 01  music<    0 Hz,   320 ms>
+  1a8a: f6 00 00 01  music<  246 Hz,   256 ms>
+  1a8e: 00 00 40 6d  music<    0 Hz, 27968 ms>
+  1a92: dc 00 00 01  music<  220 Hz,   256 ms>
+  1a96: 00 00 40 01  music<    0 Hz,   320 ms>
+  1a9a: dc 00 00 01  music<  220 Hz,   256 ms>
+  1a9e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1aa2: 05 01 00 01  music<  261 Hz,   256 ms>
+  1aa6: 00 00 40 01  music<    0 Hz,   320 ms>
+  1aaa: dc 00 00 01  music<  220 Hz,   256 ms>
+  1aae: 00 00 40 01  music<    0 Hz,   320 ms>
+  1ab2: 25 01 00 01  music<  293 Hz,   256 ms>
+  1ab6: 00 00 40 01  music<    0 Hz,   320 ms>
+  1aba: dc 00 00 01  music<  220 Hz,   256 ms>
+  1abe: 00 00 40 01  music<    0 Hz,   320 ms>
+  1ac2: 49 01 00 01  music<  329 Hz,   256 ms>
+  1ac6: 00 00 40 01  music<    0 Hz,   320 ms>
+  1aca: 25 01 00 01  music<  293 Hz,   256 ms>
+  1ace: 00 00 40 01  music<    0 Hz,   320 ms>
+  1ad2: 05 01 00 01  music<  261 Hz,   256 ms>
+  1ad6: 00 00 40 01  music<    0 Hz,   320 ms>
+  1ada: 05 01 00 01  music<  261 Hz,   256 ms>
+  1ade: 00 00 40 01  music<    0 Hz,   320 ms>
+  1ae2: 49 01 00 01  music<  329 Hz,   256 ms>
+  1ae6: 00 00 40 01  music<    0 Hz,   320 ms>
+  1aea: 05 01 00 01  music<  261 Hz,   256 ms>
+  1aee: 00 00 40 01  music<    0 Hz,   320 ms>
+  1af2: 87 01 00 01  music<  391 Hz,   256 ms>
+  1af6: 00 00 40 01  music<    0 Hz,   320 ms>
+  1afa: 05 01 00 01  music<  261 Hz,   256 ms>
+  1afe: 00 00 40 01  music<    0 Hz,   320 ms>
+  1b02: 49 01 00 01  music<  329 Hz,   256 ms>
+  1b06: 00 00 40 01  music<    0 Hz,   320 ms>
+  1b0a: 05 01 00 01  music<  261 Hz,   256 ms>
+  1b0e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1b12: c3 00 00 01  music<  195 Hz,   256 ms>
+  1b16: 00 00 40 01  music<    0 Hz,   320 ms>
+  1b1a: c3 00 00 01  music<  195 Hz,   256 ms>
+  1b1e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1b22: f6 00 00 01  music<  246 Hz,   256 ms>
+  1b26: 00 00 40 01  music<    0 Hz,   320 ms>
+  1b2a: c3 00 00 01  music<  195 Hz,   256 ms>
+  1b2e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1b32: 05 01 00 01  music<  261 Hz,   256 ms>
+  1b36: 00 00 40 01  music<    0 Hz,   320 ms>
+  1b3a: c3 00 00 01  music<  195 Hz,   256 ms>
+  1b3e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1b42: 25 01 00 01  music<  293 Hz,   256 ms>
+  1b46: 00 00 40 01  music<    0 Hz,   320 ms>
+  1b4a: 05 01 00 01  music<  261 Hz,   256 ms>
+  1b4e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1b52: ae 00 00 01  music<  174 Hz,   256 ms>
+  1b56: 00 00 40 01  music<    0 Hz,   320 ms>
+  1b5a: ae 00 00 01  music<  174 Hz,   256 ms>
+  1b5e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1b62: dc 00 00 01  music<  220 Hz,   256 ms>
+  1b66: 00 00 40 01  music<    0 Hz,   320 ms>
+  1b6a: ae 00 00 01  music<  174 Hz,   256 ms>
+  1b6e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1b72: 05 01 00 01  music<  261 Hz,   256 ms>
+  1b76: 00 00 40 01  music<    0 Hz,   320 ms>
+  1b7a: ae 00 00 01  music<  174 Hz,   256 ms>
+  1b7e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1b82: 05 01 00 01  music<  261 Hz,   256 ms>
+  1b86: 00 00 40 01  music<    0 Hz,   320 ms>
+  1b8a: f6 00 00 01  music<  246 Hz,   256 ms>
+  1b8e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1b92: dc 00 00 01  music<  220 Hz,   256 ms>
+  1b96: 00 00 40 01  music<    0 Hz,   320 ms>
+  1b9a: dc 00 00 01  music<  220 Hz,   256 ms>
+  1b9e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1ba2: 05 01 00 01  music<  261 Hz,   256 ms>
+  1ba6: 00 00 40 01  music<    0 Hz,   320 ms>
+  1baa: dc 00 00 01  music<  220 Hz,   256 ms>
+  1bae: 00 00 40 01  music<    0 Hz,   320 ms>
+  1bb2: 25 01 00 01  music<  293 Hz,   256 ms>
+  1bb6: 00 00 40 01  music<    0 Hz,   320 ms>
+  1bba: dc 00 00 01  music<  220 Hz,   256 ms>
+  1bbe: 00 00 40 01  music<    0 Hz,   320 ms>
+  1bc2: 49 01 00 01  music<  329 Hz,   256 ms>
+  1bc6: 00 00 40 01  music<    0 Hz,   320 ms>
+  1bca: 25 01 00 01  music<  293 Hz,   256 ms>
+  1bce: 00 00 40 01  music<    0 Hz,   320 ms>
+  1bd2: 05 01 00 01  music<  261 Hz,   256 ms>
+  1bd6: 00 00 40 01  music<    0 Hz,   320 ms>
+  1bda: 05 01 00 01  music<  261 Hz,   256 ms>
+  1bde: 00 00 40 01  music<    0 Hz,   320 ms>
+  1be2: 49 01 00 01  music<  329 Hz,   256 ms>
+  1be6: 00 00 40 01  music<    0 Hz,   320 ms>
+  1bea: 05 01 00 01  music<  261 Hz,   256 ms>
+  1bee: 00 00 40 01  music<    0 Hz,   320 ms>
+  1bf2: 87 01 00 01  music<  391 Hz,   256 ms>
+  1bf6: 00 00 40 01  music<    0 Hz,   320 ms>
+  1bfa: 05 01 00 01  music<  261 Hz,   256 ms>
+  1bfe: 00 00 40 01  music<    0 Hz,   320 ms>
+  1c02: 49 01 00 01  music<  329 Hz,   256 ms>
+  1c06: 00 00 40 01  music<    0 Hz,   320 ms>
+  1c0a: 05 01 00 01  music<  261 Hz,   256 ms>
+  1c0e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1c12: c3 00 00 01  music<  195 Hz,   256 ms>
+  1c16: 00 00 40 01  music<    0 Hz,   320 ms>
+  1c1a: c3 00 00 01  music<  195 Hz,   256 ms>
+  1c1e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1c22: f6 00 00 01  music<  246 Hz,   256 ms>
+  1c26: 00 00 40 01  music<    0 Hz,   320 ms>
+  1c2a: c3 00 00 01  music<  195 Hz,   256 ms>
+  1c2e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1c32: 05 01 00 01  music<  261 Hz,   256 ms>
+  1c36: 00 00 40 01  music<    0 Hz,   320 ms>
+  1c3a: c3 00 00 01  music<  195 Hz,   256 ms>
+  1c3e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1c42: 25 01 00 01  music<  293 Hz,   256 ms>
+  1c46: 00 00 40 01  music<    0 Hz,   320 ms>
+  1c4a: 05 01 00 01  music<  261 Hz,   256 ms>
+  1c4e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1c52: ae 00 00 01  music<  174 Hz,   256 ms>
+  1c56: 00 00 40 01  music<    0 Hz,   320 ms>
+  1c5a: ae 00 00 01  music<  174 Hz,   256 ms>
+  1c5e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1c62: dc 00 00 01  music<  220 Hz,   256 ms>
+  1c66: 00 00 40 01  music<    0 Hz,   320 ms>
+  1c6a: ae 00 00 01  music<  174 Hz,   256 ms>
+  1c6e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1c72: 05 01 00 01  music<  261 Hz,   256 ms>
+  1c76: 00 00 40 01  music<    0 Hz,   320 ms>
+  1c7a: ae 00 00 01  music<  174 Hz,   256 ms>
+  1c7e: 00 00 40 01  music<    0 Hz,   320 ms>
+  1c82: 05 01 00 01  music<  261 Hz,   256 ms>
+  1c86: 00 00 40 01  music<    0 Hz,   320 ms>
+  1c8a: f6 00 00 02  music<  246 Hz,   512 ms>
+image_win:
+  1c8e: ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+  1cc0: ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+  1cf2: ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+  1d24: ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+  1d56: ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+  1d88: ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+  1dba: ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+  1dec: ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffeeeeffffffffffffffffffffffff
+  1e1e: ffffffffffffffffffe8aaaaaaaaa8effffffffffffffffffffffffffffffffffffaaaaaaaaaaaaaa8ffffffffffffffffff
+  1e50: fffffffffffffffeaaaaaaaaaaaaaaaaaffffffffffffffffffffffffffffffffaaaaaaaaaa8aaaaaaaaffffffffffffffff
+  1e82: ffffffffffffffaaaaaaaaaaef9aaaaaaaaffffffffffffffffffffffffffffaaaaaaaaaaaff99aaaaaaa8ffffffffffffff
+  1eb4: ffffffffffffeaaaaaaaaaaefe9999aaaaaaefffffffffffffffffffffffffaaaaaaaaaaaffe99999aaaaaefffffffffffff
+  1ee6: ffffffffffffaaaaaaaaaaeffe9999999aaeaffffffffffffffffffffffff8aaaaaaaaaafff8999999988aa8ffffffffffff
+  1f18: fffffffffffaaaaaaaaaaffff899999aea9aaafffffffffffffffffffffff8eaaaaaaaaffffe88eeea99999affffffffffff
+  1f4a: fffffffffffaaa8aaaaaffffffffff9999999afffffffffffffffffffffffaaaaa8ea8fffffffffa9999999affffffffffff
+  1f7c: fffffffffffaaaaaaaaffffffffff99999999afffffffffffffffffffffffaaaaaaa8fffffffff8999999998ffffffffffff
+  1fae: fffffffffffeaaaaaaaaaea8ffffa99999999effffffffffffffffffffffffaaaaaaa88aa8fff888aaa999afffffffffffff
+  1fe0: ffffffffffff8aaaa88aaaaefff99999aeeaeffffffffffffffffffffffffffaa88aaaaaaeffa99999999affffffffffffff
+  2012: ffffffffffffff8aaaaaaaafff999999999effffffffffffffffffffffffffffaaaaaaaaaff899999999afffffffffffffff
+  2044: fffffffffffffffaaaaaaaaff9999999aafffffffffffffffffffffffffffffffffaaaaaaf8999999affffffffffffffffff
+  2076: ffffffffffffffffffeaaaa8a9999aefffffffffffffffffffffffffffffffffffffffe8aaaaaaefffffffffffffffffffff
+  20a8: ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+  20da: ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+  210c: ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+  213e: ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+  2170: ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+  21a2: ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+  21d4: ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+  2206: ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+  2238: ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+  226a: ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+  229c: ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
