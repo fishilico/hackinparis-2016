@@ -1,0 +1,489 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Hack In Paris Challenge 2 &mdash; HIPChall 2016 write-up</title>
+    
+    <link rel="stylesheet" href="_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="HIPChall 2016 write-up" href="index.html" />
+    <link rel="next" title="Hack In Paris Challenge 3" href="challenge3.html" />
+    <link rel="prev" title="Hack In Paris Challenge 1" href="challenge1.html" /> 
+  </head>
+  <body role="document">
+      <div class="header" role="banner"><h1 class="heading"><a href="index.html">
+          <span>HIPChall 2016 write-up</span></a></h1>
+        <h2 class="heading"><span>Hack In Paris Challenge 2</span></h2>
+      </div>
+      <div class="topnav" role="navigation" aria-label="top navigation">
+      
+        <p>
+        «&#160;&#160;<a href="challenge1.html">Hack In Paris Challenge 1</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="challenge3.html">Hack In Paris Challenge 3</a>&#160;&#160;»
+        </p>
+
+      </div>
+      <div class="content">
+        
+        
+  <div class="section" id="hack-in-paris-challenge-2">
+<h1>Hack In Paris Challenge 2<a class="headerlink" href="#hack-in-paris-challenge-2" title="Permalink to this headline">¶</a></h1>
+<p>The challenge began on Wednesday February, 3rd 2016, with a <a class="reference external" href="https://twitter.com/hackinparis/status/694807800380260352">tweet</a>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1">#HIPChall Number 2 : http://bit.ly/1QbHueV  #FrenchTouch</span>
+<span class="n">A</span> <span class="c1">#BLESnifferp and Two #HIPGoldenTickets to win!</span>
+<span class="n">Be</span> <span class="n">the</span> <span class="n">first</span><span class="p">,</span> <span class="n">Be</span> <span class="n">Fair</span> <span class="n">play</span><span class="p">,</span> <span class="n">Enjoy</span>
+</pre></div>
+</div>
+<p>This tweet indicates a web site again, The link to <a class="reference external" href="https://hackinparis.com/challenge-2.html">https://hackinparis.com/challenge-2.html</a>.
+It contains this message:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">CHALLENGE</span> <span class="c1">#HIPCHALL - STEP 2</span>
+<span class="n">Hello</span><span class="p">,</span>
+
+<span class="n">You</span> <span class="n">are</span> <span class="n">investigating</span> <span class="n">on</span> <span class="n">behalf</span> <span class="n">of</span> <span class="n">a</span> <span class="n">subsidiary</span> <span class="n">of</span> <span class="n">the</span> <span class="n">ANFN</span> <span class="n">group</span> <span class="n">based</span>
+<span class="n">on</span> <span class="n">a</span> <span class="n">suspicion</span> <span class="n">of</span> <span class="n">industrial</span> <span class="n">espionage</span> <span class="p">;</span> <span class="n">an</span> <span class="n">employee</span> <span class="n">has</span> <span class="n">refused</span> <span class="n">to</span>
+<span class="n">report</span> <span class="n">to</span> <span class="n">the</span> <span class="n">internal</span> <span class="n">interview</span> <span class="ow">and</span> <span class="n">did</span> <span class="ow">not</span> <span class="n">cooperate</span> <span class="k">with</span> <span class="n">the</span> <span class="n">analysis</span>
+<span class="n">of</span> <span class="n">his</span> <span class="n">post</span><span class="o">.</span> <span class="n">You</span> <span class="n">got</span> <span class="n">a</span> <span class="n">memory</span> <span class="n">image</span> <span class="n">by</span> <span class="n">a</span> <span class="n">roundabout</span> <span class="n">way</span><span class="o">.</span>
+<span class="n">The</span> <span class="n">image</span> <span class="ow">is</span> <span class="n">available</span> <span class="n">at</span> <span class="n">the</span> <span class="n">following</span> <span class="n">address</span><span class="p">:</span>
+
+ <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">hackinparis</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">chall2016</span><span class="o">/</span><span class="n">step</span><span class="o">-</span><span class="mi">2</span><span class="o">/</span><span class="n">dump</span><span class="o">.</span><span class="mi">7</span><span class="n">z</span>
+
+<span class="n">The</span> <span class="n">fingerprints</span> <span class="k">for</span> <span class="n">memdump_0x0</span><span class="o">-</span><span class="mh">0x100000000</span><span class="n">_20160127</span><span class="o">-</span><span class="mf">125924.</span><span class="n">bin</span> <span class="p">:</span>
+
+ <span class="n">md5</span> <span class="n">e60e726b0bd6f3ed02c063ea4df43add</span>
+ <span class="n">sha256</span> <span class="mi">6081121</span><span class="n">b669bbd6e16da754799ba1f366953e7ab159149b1943b436a5d11bbef</span>
+
+<span class="n">Once</span> <span class="n">you</span> <span class="n">have</span> <span class="n">completed</span> <span class="n">the</span> <span class="n">analysis</span><span class="p">,</span> <span class="n">please</span> <span class="n">send</span> <span class="n">your</span> <span class="n">conclusions</span>
+<span class="p">(</span><span class="ow">and</span> <span class="n">the</span> <span class="n">validation</span> <span class="n">flag</span><span class="p">)</span> <span class="n">to</span> <span class="n">merenwen</span><span class="nd">@hackinparis</span><span class="o">.</span><span class="n">com</span><span class="o">.</span>
+</pre></div>
+</div>
+<p>The given 7zip file contains <code class="docutils literal"><span class="pre">memdump_0x0-0x100000000_20160127-125924.bin</span></code>, which is 4GB-large (4294967295 bytes).
+Its MD5 and SHA256 sums match the ones which are given in the message.</p>
+<p>Running volatility (<a class="reference external" href="https://github.com/volatilityfoundation/volatility">https://github.com/volatilityfoundation/volatility</a>) on the file to get information about this captured image leads (after 30 minutes on my laptop) to the following result:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ volatility -f memdump_0x0-0x100000000_20160127-125924.bin imageinfo
+Volatility Foundation Volatility Framework 2.5
+INFO    : volatility.debug : Determining profile based on KDBG search...
+          Suggested Profile(s) : Win7SP0x64, Win7SP1x64, Win2008R2SP0x64, Win2008R2SP1x64
+                     AS Layer1 : AMD64PagedMemory (Kernel AS)
+                     AS Layer2 : FileAddressSpace (/tmp/memdump_0x0-0x100000000_20160127-125924.bin)
+                      PAE type : No PAE
+                           DTB : 0x187000
+                          KDBG : 0xf80003a4d0a0
+          Number of Processors : 1
+     Image Type (Service Pack) : 1
+                KPCR for CPU 0 : 0xfffff80003a4ed00
+             KUSER_SHARED_DATA : 0xfffff78000000000
+           Image date and time : 2016-01-27 12:06:45 UTC+0000
+     Image local date and time : 2016-01-27 13:06:45 +0100
+
+$ volatility -f memdump_0x0-0x100000000_20160127-125924.bin kdbgscan
+Volatility Foundation Volatility Framework 2.5
+**************************************************
+Instantiating KDBG using: memdump_0x0-0x100000000_20160127-125924.bin WinXPSP2x86 (5.1.0 32bit)
+Offset (P)                    : 0x3a4d0a0
+KDBG owner tag check          : True
+Profile suggestion (KDBGHeader): Win7SP1x64
+PsActiveProcessHead           : 0x3a83590
+PsLoadedModuleList            : 0x3aa1890
+KernelBase                    : 0xfffff8000385e000
+
+$ volatility -f memdump_0x0-0x100000000_20160127-125924.bin kdbgscan --profile=Win7SP1x64
+Volatility Foundation Volatility Framework 2.5
+**************************************************
+Instantiating KDBG using: Kernel AS Win7SP1x64 (6.1.7601 64bit)
+Offset (V)                    : 0xf80003a4d0a0
+Offset (P)                    : 0x3a4d0a0
+KDBG owner tag check          : True
+Profile suggestion (KDBGHeader): Win7SP1x64
+Version64                     : 0xf80003a4d068 (Major: 15, Minor: 7601)
+Service Pack (CmNtCSDVersion) : 1
+Build string (NtBuildLab)     : P7?
+PsActiveProcessHead           : 0xfffff80003a83590 (2 processes)
+PsLoadedModuleList            : 0xfffff80003aa1890 (1 modules)
+KernelBase                    : 0xfffff8000385e000 (Matches MZ: True)
+Major (OptionalHeader)        : 6
+Minor (OptionalHeader)        : 1
+KPCR                          : 0xfffff80003a4ed00 (CPU 0)
+</pre></div>
+</div>
+<p>The version field &#8220;Major: 15, Minor: 7601&#8221; states that the image has been taken from a system running Windows 7 SP1.
+The volatility profile to use is therefore Win7SP1x64.</p>
+<p>However with this profile, <code class="docutils literal"><span class="pre">psscan</span></code> does not show good results:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ volatility -f memdump_0x0-0x100000000_20160127-125924.bin --profile=Win7SP1x64 --dtb=0x187000 --kdbg=0x3a4d0a0 psscan
+Volatility Foundation Volatility Framework 2.5
+Offset(P)          Name                PID   PPID PDB                Time created                   Time exited
+------------------ ---------------- ------ ------ ------------------ ------------------------------ ------------------------------
+0x00000000433d2040 System                4      0 0x0000000000187000 2016-01-27 11:24:51 UTC+0000
+</pre></div>
+</div>
+<p>The system might not have been running when the image has been taken...</p>
+<p>A quick keyword analysis of the strings which can be found in the memory dump (using <code class="docutils literal"><span class="pre">strings</span> <span class="pre">-tx</span></code> and <code class="docutils literal"><span class="pre">strings</span> <span class="pre">-tx</span> <span class="pre">-e</span> <span class="pre">l</span></code> to print sequences of printable characters with their hexadecimal offsets) shows:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">a0b03db</span> <span class="o">@</span>\<span class="n">malwhere</span>\<span class="n">malwhere</span><span class="o">.</span><span class="n">exe</span>
+<span class="n">e12b688</span> <span class="s2">&quot;C:\malware.exe&quot;</span>
+<span class="mi">33</span><span class="n">dc8648</span> <span class="n">C</span><span class="p">:</span>\<span class="n">malware</span><span class="o">.</span><span class="n">exe</span>
+<span class="n">af219078</span> <span class="n">C</span><span class="p">:</span>\<span class="n">malware</span><span class="o">.</span><span class="n">exe</span>
+
+<span class="mi">1</span><span class="n">daf6a80</span> <span class="o">.+</span><span class="p">:</span>\\<span class="n">HACKING</span>\\<span class="n">VYMPIRE</span>\\<span class="n">CRYPT</span>\\<span class="n">child</span>\\<span class="o">.+.</span><span class="n">vbp</span>
+
+<span class="c1"># These are strings from Metasploit framework</span>
+<span class="mi">50</span><span class="n">c702e0</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">www</span><span class="o">.</span><span class="n">amazon</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">Oracle</span><span class="o">-</span><span class="n">Hackers</span><span class="o">-</span><span class="n">Handbook</span><span class="o">-</span><span class="n">Hacking</span><span class="o">-</span><span class="n">Defending</span><span class="o">/</span><span class="n">dp</span><span class="o">/</span><span class="mi">0470080221</span>
+<span class="mi">7045</span><span class="n">f3aa</span> <span class="n">ent</span> <span class="n">feedback</span><span class="o">.</span> <span class="n">Some</span> <span class="n">people</span> <span class="n">just</span> <span class="n">seem</span> <span class="n">to</span> <span class="n">enjoy</span> <span class="n">hacking</span> <span class="n">SAP</span> <span class="p">:)</span>
+<span class="mi">91183</span><span class="n">fc8</span> <span class="n">lent</span> <span class="n">feedback</span><span class="o">.</span> <span class="n">Some</span> <span class="n">people</span> <span class="n">just</span> <span class="n">seem</span> <span class="n">to</span> <span class="n">enjoy</span> <span class="n">hacking</span> <span class="n">SAP</span> <span class="p">:)</span>
+<span class="n">b2d5ec88</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">sh0dan</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="n">oldfiles</span><span class="o">/</span><span class="n">hackingcitrix</span><span class="o">.</span><span class="n">html</span>
+</pre></div>
+</div>
+<p>There are also two interesting email addresses, <a class="reference external" href="mailto:xavuddyhe-7642&#37;&#52;&#48;yopmail&#46;com">xavuddyhe-7642<span>&#64;</span>yopmail<span>&#46;</span>com</a> (used as LastPass account, according to an XML file at offset <code class="docutils literal"><span class="pre">b400420c</span></code>) and <a class="reference external" href="mailto:fla&#37;&#52;&#48;ndh&#46;com">fla<span>&#64;</span>ndh<span>&#46;</span>com</a> (used as Google account, according to structures at offset <code class="docutils literal"><span class="pre">1b481b5c</span></code>).</p>
+<p>The memory dump also contains information about files which may have been loaded into RAM (which explains the Metasploit strings).
+To dump such files, <code class="docutils literal"><span class="pre">mftparser</span></code> command can be used in Volatility:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">volatility</span> <span class="o">-</span><span class="n">f</span> <span class="n">memdump_0x0</span><span class="o">-</span><span class="mh">0x100000000</span><span class="n">_20160127</span><span class="o">-</span><span class="mf">125924.</span><span class="n">bin</span> <span class="o">--</span><span class="n">profile</span><span class="o">=</span><span class="n">Win7SP1x64</span> \
+<span class="o">--</span><span class="n">dtb</span><span class="o">=</span><span class="mh">0x187000</span> <span class="o">--</span><span class="n">kdbg</span><span class="o">=</span><span class="mh">0xf80003a4d0a0</span> <span class="o">--</span><span class="n">kpcr</span><span class="o">=</span><span class="mh">0xfffff80003a4ed00</span> <span class="n">mftparser</span>
+</pre></div>
+</div>
+<p>Analyzing the output of this command (with file paths) shows the following things:</p>
+<ul>
+<li><p class="first">Some files contain data in memory (with a <code class="docutils literal"><span class="pre">$DATA</span></code> part), other not.</p>
+</li>
+<li><p class="first">The Metasploit framework was installed in <code class="docutils literal"><span class="pre">C:\metasploit\apps\pro\msf3\`</span></code> on 2012-12-14 (which is quite old).</p>
+</li>
+<li><p class="first">There also is a postgresql server running, with log files named like <code class="docutils literal"><span class="pre">postgresql-2016-01-27_112224.log</span></code>, but with no useful information.</p>
+</li>
+<li><p class="first">There are two user home directories on the system: <code class="docutils literal"><span class="pre">C:\Users\ghost</span></code> (used in April 2013 according to a log in <code class="docutils literal"><span class="pre">PROGRA~3\Intel\Package</span> <span class="pre">Cache\{409CB30E-E457-4008-9B1A-ED1B9EA21140}\INSTAL~1.DAT</span></code>) and <code class="docutils literal"><span class="pre">C:\Users\lolipop</span></code>.</p>
+</li>
+<li><p class="first">The file <code class="docutils literal"><span class="pre">Users\ghost\Links\Desktop.lnk</span></code> seems to suggest that <code class="docutils literal"><span class="pre">C:\Users</span></code> is a network mount of <code class="docutils literal"><span class="pre">\\SYSDREAM-PC\Users</span></code>.</p>
+</li>
+<li><p class="first">There are also many Chrome-related files.</p>
+</li>
+<li><p class="first">On Windows, downloaded files get a special NTFS attribute which defines a <em>Zone Identifier</em>.
+<code class="docutils literal"><span class="pre">volatility</span> <span class="pre">mftparser</span></code> reports two such files:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>MFT entry found at offset 0x38015400
+Attribute: In Use &amp; File
+Record Number: 185741
+Link count: 2
+
+
+$STANDARD_INFORMATION
+Creation                       Modified                       MFT Altered                    Access Date                    Type
+------------------------------ ------------------------------ ------------------------------ ------------------------------ ----
+2016-01-27 10:09:02 UTC+0000 2016-01-27 10:09:09 UTC+0000   2016-01-27 10:09:09 UTC+0000   2016-01-27 10:09:02 UTC+0000   Archive
+
+$FILE_NAME
+Creation                       Modified                       MFT Altered                    Access Date                    Name/Path
+------------------------------ ------------------------------ ------------------------------ ------------------------------ ---------
+2016-01-27 10:09:02 UTC+0000 2016-01-27 10:09:02 UTC+0000   2016-01-27 10:09:08 UTC+0000   2016-01-27 10:09:02 UTC+0000   Users\lolipop\DOWNLO~1\CONFTX~2.ZIP
+
+$FILE_NAME
+Creation                       Modified                       MFT Altered                    Access Date                    Name/Path
+------------------------------ ------------------------------ ------------------------------ ------------------------------ ---------
+2016-01-27 10:09:02 UTC+0000 2016-01-27 10:09:02 UTC+0000   2016-01-27 10:09:08 UTC+0000   2016-01-27 10:09:02 UTC+0000   Users\lolipop\DOWNLO~1\conf.txt (1).zip
+
+$DATA
+0000000000: 50 4b 03 04 33 03 01 00 63 00 ba 60 3b 48 00 00   PK..3...c..`;H..
+0000000010: 00 00 7c 00 00 00 6c 00 00 00 08 00 0b 00 63 6f   ..|...l.......co
+0000000020: 6e 66 2e 74 78 74 01 99 07 00 02 00 41 45 01 08   nf.txt......AE..
+0000000030: 00 4c ed f3 e0 f2 9e 38 f8 ef b7 e9 cd bf e3 bf   .L.....8........
+0000000040: 53 dd e0 0b a1 f5 33 36 3a 76 e1 5b dd af 2d 1e   S.....36:v.[..-.
+0000000050: 60 aa 4f 1d 8a 53 a1 39 b0 d2 06 d7 1f 64 63 1c   `.O..S.9.....dc.
+0000000060: dd f2 91 8f 6f 98 1c da 9a d8 66 9e 9a 25 6d 93   ....o.....f..%m.
+0000000070: 2e 90 54 9e 71 b2 21 6e e8 92 fa 9c 34 4c 57 f0   ..T.q.!n....4LW.
+0000000080: 3c 9b fe 33 af 16 81 b2 ab 24 cd eb cc e2 46 09   &lt;..3.....$....F.
+0000000090: f7 73 48 d4 12 d5 47 35 18 eb 91 f7 2f 3f d6 ec   .sH...G5..../?..
+00000000a0: e3 17 29 74 5c 80 37 f6 00 41 43 22 85 50 4b 01   ..)t\.7..AC&quot;.PK.
+00000000b0: 02 3f 03 33 03 01 00 63 00 ba 60 3b 48 00 00 00   .?.3...c..`;H...
+00000000c0: 00 7c 00 00 00 6c 00 00 00 08 00 2f 00 00 00 00   .|...l...../....
+00000000d0: 00 00 00 20 80 a4 81 00 00 00 00 63 6f 6e 66 2e   ...........conf.
+00000000e0: 74 78 74 0a 00 20 00 00 00 00 00 01 00 18 00 00   txt.............
+00000000f0: 28 7d af f2 58 d1 01 80 37 82 ac f2 58 d1 01 00   (}..X...7...X...
+0000000100: 28 7d af f2 58 d1 01 01 99 07 00 02 00 41 45 01   (}..X........AE.
+0000000110: 08 00 50 4b 05 06 00 00 00 00 01 00 01 00 65 00   ..PK..........e.
+0000000120: 00 00 ad 00 00 00 00 00                           ........
+
+$DATA ADS Name: Zone.Identifier
+0000000000: 5b 5a 6f 6e 65 54 72 61 6e 73 66 65 72 5d 0d 0a   [ZoneTransfer]..
+0000000010: 5a 6f 6e 65 49 64 3d 33 0d 0a                     ZoneId=3..
+
+***************************************************************************
+***************************************************************************
+MFT entry found at offset 0x3f301800
+Attribute: In Use &amp; File
+Record Number: 189896
+Link count: 2
+
+
+$STANDARD_INFORMATION
+Creation                       Modified                       MFT Altered                    Access Date                    Type
+------------------------------ ------------------------------ ------------------------------ ------------------------------ ----
+2016-01-27 09:59:04 UTC+0000 2016-01-27 09:59:06 UTC+0000   2016-01-27 09:59:06 UTC+0000   2016-01-27 09:59:04 UTC+0000   Archive
+
+$FILE_NAME
+Creation                       Modified                       MFT Altered                    Access Date                    Name/Path
+------------------------------ ------------------------------ ------------------------------ ------------------------------ ---------
+2016-01-27 09:59:04 UTC+0000 2016-01-27 09:59:04 UTC+0000   2016-01-27 09:59:05 UTC+0000   2016-01-27 09:59:04 UTC+0000   Users\lolipop\DOWNLO~1\conf.txt.zip
+
+$FILE_NAME
+Creation                       Modified                       MFT Altered                    Access Date                    Name/Path
+------------------------------ ------------------------------ ------------------------------ ------------------------------ ---------
+2016-01-27 09:59:04 UTC+0000 2016-01-27 09:59:04 UTC+0000   2016-01-27 09:59:05 UTC+0000   2016-01-27 09:59:04 UTC+0000   Users\lolipop\DOWNLO~1\CONFTX~1.ZIP
+
+$DATA
+0000000000: 50 4b 03 04 33 03 01 00 63 00 50 71 9e 47 00 00   PK..3...c.Pq.G..
+0000000010: 00 00 7c 00 00 00 6c 00 00 00 08 00 0b 00 63 6f   ..|...l.......co
+0000000020: 6e 66 2e 74 78 74 01 99 07 00 02 00 41 45 01 08   nf.txt......AE..
+0000000030: 00 cb b9 a1 dc 90 6a 25 5b bf c3 b1 36 8e 1c 65   ......j%[...6..e
+0000000040: 8c e1 35 55 18 7b bb ce 35 b8 ad 88 c4 6e 00 22   ..5U.{..5....n.&quot;
+0000000050: b4 48 9e 01 eb 6e 08 f5 27 a0 a7 a5 cd ed eb 8d   .H...n..&#39;.......
+0000000060: 9e 3c cc f0 c3 20 ce ad dd 5e 2c a0 80 d7 5a 2d   .&lt;.......^,...Z-
+0000000070: 5f 67 07 47 1c fa 46 31 34 c9 59 f5 cc 23 47 93   _g.G..F14.Y..#G.
+0000000080: 9c d7 2b d7 0a 2b e8 b2 f4 8c 83 d5 d0 87 93 b6   ..+..+..........
+0000000090: 6a c5 48 4d d6 16 73 b6 86 dd 1c ac ba 01 04 e9   j.HM..s.........
+00000000a0: 56 c8 50 d4 2b 80 ee a4 f0 0a 56 72 41 50 4b 01   V.P.+.....VrAPK.
+00000000b0: 02 3f 03 33 03 01 00 63 00 50 71 9e 47 00 00 00   .?.3...c.Pq.G...
+00000000c0: 00 7c 00 00 00 6c 00 00 00 08 00 2f 00 00 00 00   .|...l...../....
+00000000d0: 00 00 00 20 80 a4 81 00 00 00 00 63 6f 6e 66 2e   ...........conf.
+00000000e0: 74 78 74 0a 00 20 00 00 00 00 00 01 00 18 00 80   txt.............
+00000000f0: fd c0 75 03 43 d1 01 80 fd c0 75 03 43 d1 01 80   ..u.C.....u.C...
+0000000100: fd c0 75 03 43 d1 01 01 99 07 00 02 00 41 45 01   ..u.C........AE.
+0000000110: 08 00 50 4b 05 06 00 00 00 00 01 00 01 00 65 00   ..PK..........e.
+0000000120: 00 00 ad 00 00 00 00 00                           ........
+
+$DATA ADS Name: Zone.Identifier
+0000000000: 5b 5a 6f 6e 65 54 72 61 6e 73 66 65 72 5d 0d 0a   [ZoneTransfer]..
+0000000010: 5a 6f 6e 65 49 64 3d 33 0d 0a                     ZoneId=3..
+</pre></div>
+</div>
+</li>
+</ul>
+<p>So, there are two downloaded files, <code class="docutils literal"><span class="pre">conf.txt.zip</span></code> (downloaded on 2016-01-27 09:59:04 UTC) and <code class="docutils literal"><span class="pre">conf.txt</span> <span class="pre">(1).zip</span></code> (downloaded on 2016-01-27 10:09:09 UTC).
+Both these ZIP files contain a file named <code class="docutils literal"><span class="pre">conf.txt</span></code>, which is encrypted.
+John The Ripper could be used to crack the password, with zip2john output:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ zip2john conf.txt*.zip | tee zip.hashes
+conf.txt (1).zip-&gt;conf.txt is using AES encryption, extrafield_length is 11
+conf.txt.zip-&gt;conf.txt is using AES encryption, extrafield_length is 11
+
+$ cat zip.hashes
+conf.txt (1).zip:$zip$*0*1*4cedf3e0f29e38f8*efb7
+conf.txt.zip:$zip$*0*1*cbb9a1dc906a255b*bfc3
+
+$ john zip.hashes
+Loaded 2 password hashes with 2 different salts (WinZip PBKDF2-HMAC-SHA-1 [32/64])
+</pre></div>
+</div>
+<p>However John does not find anything in a reasonable time.</p>
+<p>At that point, a hint was given to solve the challenge, <a class="reference external" href="https://twitter.com/hackinparis/status/695638145396772864">https://twitter.com/hackinparis/status/695638145396772864</a>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>#HIPChall n°2 FIRST HINT
+Have fun, Be fair play, enjoy :)
+
+« A quick analysis of the corporate proxy logs revealed the top 5 domains requested by the suspect in the past 7 days:
+- accounts.google.com
+- www.amazon.fr
+- s000.tinyupload.com
+- www.adobe.com
+- www.youtube.com »
+                            Sysdream&#39;s team
+</pre></div>
+</div>
+<p>Using <code class="docutils literal"><span class="pre">strings</span> <span class="pre">-tx</span> <span class="pre">|</span> <span class="pre">grep</span> <span class="pre">-C5</span></code> to match the domains with some contextual information reveal several things.</p>
+<ul>
+<li><p class="first"><a class="reference external" href="http://s000.tinyupload.com/">http://s000.tinyupload.com/</a> has been used to download the encrypted ZIP files:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>6f579ceb AAC:\Users\lolipop\Downloads\conf.txt (1).zipC:\Users\lolipop\Downloads\conf.txt (1).zip
+6f579d5b http://s000.tinyupload.com/index.php?file_id=05543746886013196000application/force-downloadapplication/force-download
+6f579de5 AAC:\Users\lolipop\Downloads\conf.txt.zipC:\Users\lolipop\Downloads\conf.txt.zip
+6f579e4d http://s000.tinyupload.com/index.php?file_id=15631730723919732671application/force-downloadapplication/force-download
+</pre></div>
+</div>
+</li>
+<li><p class="first">There are JSON dumps of LastPass structures used for a Google account, but with encrypted passwords:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">16</span><span class="n">d214d</span> \<span class="s2">&quot;,</span><span class="se">\&quot;</span><span class="s2">group</span><span class="se">\&quot;</span><span class="s2">:</span><span class="se">\&quot;</span><span class="s2">Mail</span><span class="se">\&quot;</span><span class="s2">,</span><span class="se">\&quot;</span><span class="s2">url</span><span class="se">\&quot;</span><span class="s2">:</span><span class="se">\&quot;</span><span class="s2">https://accounts.google.com/ServiceLogin?service=mail&amp;continue=https://mail.google.com/mail/&amp;hl=fr#identifier</span><span class="se">\&quot;</span><span class="s2">,</span><span class="se">\&quot;</span><span class="s2">extra</span><span class="se">\&quot;</span><span class="s2">:</span><span class="se">\&quot;\&quot;</span><span class="s2">,</span><span class="se">\&quot;</span><span class="s2">fav</span><span class="se">\&quot;</span><span class="s2">:</span><span class="se">\&quot;</span><span class="s2">0</span><span class="se">\&quot;</span><span class="s2">,</span><span class="se">\&quot;</span><span class="s2">sharedfromaid</span><span class="se">\&quot;</span><span class="s2">:</span><span class="se">\&quot;\&quot;</span><span class="s2">,</span><span class="se">\&quot;</span><span class="s2">username</span><span class="se">\&quot;</span><span class="s2">:</span><span class="se">\&quot;</span><span class="s2">!</span>
+<span class="mi">16</span><span class="n">d2226</span> <span class="n">bX1</span>\\<span class="n">u008f</span>
+<span class="mi">16</span><span class="n">d2234</span> \\<span class="n">u008d</span>\\<span class="n">u001f</span>
+<span class="mi">16</span><span class="n">d2251</span> \\\<span class="s2">&quot;</span><span class="se">\\</span><span class="s2">u001a</span>
+<span class="mi">16</span><span class="n">d2262</span> \\<span class="n">u0093t</span>
+<span class="mi">16</span><span class="n">d226c</span> <span class="n">RU</span>\\<span class="n">u0006</span>
+<span class="mi">16</span><span class="n">d2277</span> \<span class="s2">&quot;,</span><span class="se">\&quot;</span><span class="s2">password</span><span class="se">\&quot;</span><span class="s2">:</span><span class="se">\&quot;</span><span class="s2">!</span>
+<span class="mi">16</span><span class="n">d228c</span> \\<span class="n">u0083</span>
+<span class="mi">16</span><span class="n">d2297</span> <span class="o">=</span><span class="n">U</span>\\<span class="n">u008eZX</span>
+<span class="mi">16</span><span class="n">d22aa</span> \\<span class="n">u000b</span>
+<span class="mi">16</span><span class="n">d22b3</span> <span class="n">d</span><span class="o">|</span>\\<span class="n">u0098T</span>\\<span class="n">n</span><span class="p">}</span>\\<span class="n">u0014</span>
+<span class="mi">16</span><span class="n">d22ce</span> <span class="n">G</span>\\<span class="n">u0097</span>\\<span class="n">u001aU681</span>\<span class="s2">&quot;,</span><span class="se">\&quot;</span><span class="s2">pwprotect</span><span class="se">\&quot;</span><span class="s2">:false,</span><span class="se">\&quot;</span><span class="s2">genpw</span><span class="se">\&quot;</span><span class="s2">:false,</span><span class="se">\&quot;</span><span class="s2">sn</span><span class="se">\&quot;</span><span class="s2">:false,</span><span class="se">\&quot;</span><span class="s2">last_touch</span><span class="se">\&quot;</span><span class="s2">:</span><span class="se">\&quot;</span><span class="s2">1451489210</span><span class="se">\&quot;</span><span class="s2">,</span><span class="se">\&quot;</span><span class="s2">autologin</span><span class="se">\&quot;</span><span class="s2">:false</span>
+<span class="p">[</span><span class="o">...</span><span class="p">]</span>
+\<span class="s2">&quot;1</span><span class="se">\&quot;</span><span class="s2">:{</span><span class="se">\&quot;</span><span class="s2">otherfield</span><span class="se">\&quot;</span><span class="s2">:false,</span><span class="se">\&quot;</span><span class="s2">name</span><span class="se">\&quot;</span><span class="s2">:</span><span class="se">\&quot;</span><span class="s2">Passwd-hidden</span><span class="se">\&quot;</span><span class="s2">,</span><span class="se">\&quot;</span><span class="s2">type</span><span class="se">\&quot;</span><span class="s2">:</span><span class="se">\&quot;</span><span class="s2">password</span><span class="se">\&quot;</span><span class="s2">,</span><span class="se">\&quot;</span><span class="s2">value</span><span class="se">\&quot;</span><span class="s2">:</span><span class="se">\&quot;</span><span class="s2">!</span>
+<span class="p">[</span><span class="o">...</span><span class="p">]</span>
+\<span class="s2">&quot;tld</span><span class="se">\&quot;</span><span class="s2">:</span><span class="se">\&quot;</span><span class="s2">google.com</span><span class="se">\&quot;</span><span class="s2">,</span><span class="se">\&quot;</span><span class="s2">unencryptedUsername</span><span class="se">\&quot;</span><span class="s2">:</span><span class="se">\&quot;</span><span class="s2">fla@ndh.com</span><span class="se">\&quot;</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<p>Even if the password is encrypted here, it may be in unencrypted elsewhere.
+Let&#8217;s grep on &#8220;Passwd-hidden&#8221; input name to be sure:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ strings -tx memdump_0x0-0x100000000_20160127-125924.bin |grep -i Passwd-hidden |grep -i value
+12dd784c 53896395004,&quot;uniqid&quot;:23476135},&quot;docid&quot;:1,&quot;sharedsite&quot;:0,&quot;automaticallyFill&quot;:1,
+&quot;is_launch&quot;:false,&quot;manualfill&quot;:false,&quot;name&quot;:&quot;Passwd-hidden&quot;,&quot;value&quot;:&quot;totoXXX69!&quot;,&quot;type&quot;:&quot;password&quot;,
+</pre></div>
+</div>
+<p>Bingo :) Even John is happy now:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ echo &#39;totoXXX69!&#39; |john --stdin zip.hashes
+Loaded 2 password hashes with 2 different salts (WinZip PBKDF2-HMAC-SHA-1 [32/64])
+totoXXX69!       (conf.txt.zip)
+totoXXX69!       (conf.txt (1).zip)
+guesses: 2  time: 0:00:00:00  c/s: 10.00  trying: totoXXX69!
+</pre></div>
+</div>
+<p>The <code class="docutils literal"><span class="pre">conf.txt</span></code> file of <code class="docutils literal"><span class="pre">conf.txt.zip</span></code> archive contains:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Connexion</span> <span class="n">VPN</span>
+<span class="n">User</span> <span class="p">:</span> <span class="n">d</span><span class="o">.</span><span class="n">fla</span>
+<span class="n">Password</span> <span class="p">:</span>
+<span class="n">NDH</span><span class="p">{</span><span class="mi">33</span><span class="n">a8c7e18f2be80243bd13b697bf101c7a53f3f30165ffd35d321e8376840caa</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>while the one from <code class="docutils literal"><span class="pre">conf.txt</span> <span class="pre">(1).zip</span></code> contains:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Connexion</span> <span class="n">VPN</span>
+<span class="n">User</span> <span class="p">:</span> <span class="n">d</span><span class="o">.</span><span class="n">fla</span>
+<span class="n">Password</span> <span class="p">:</span>
+<span class="n">HIP</span><span class="p">{</span><span class="mi">33</span><span class="n">a8c7e18f2be80243bd13b697bf101c7a53f3f30165ffd35d321e8376840caa</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>(<code class="docutils literal"><span class="pre">NDH</span></code> has been replaced with <code class="docutils literal"><span class="pre">HIP</span></code> in the password)</p>
+<p>To conclude the flag of the second Hack In Paris challenge is <strong>HIP{33a8c7e18f2be80243bd13b697bf101c7a53f3f30165ffd35d321e8376840caa}</strong>.</p>
+<div class="section" id="appendix-dump-page-table-entries">
+<h2>Appendix - dump page table entries<a class="headerlink" href="#appendix-dump-page-table-entries" title="Permalink to this headline">¶</a></h2>
+<p>With volatility, it is possible to dump the page tables once the base address (CR3 value on an X86 CPU) is known.
+<code class="docutils literal"><span class="pre">volatility</span> <span class="pre">imageinfo</span></code> gave <code class="docutils literal"><span class="pre">DTB</span> <span class="pre">:</span> <span class="pre">0x187000</span></code>, which is the base address.
+Here is a Python script to dump the page table:</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python2</span>
+<span class="kn">import</span> <span class="nn">volatility.addrspace</span> <span class="k">as</span> <span class="nn">addrspace</span>
+<span class="kn">import</span> <span class="nn">volatility.conf</span> <span class="k">as</span> <span class="nn">conf</span>
+<span class="kn">import</span> <span class="nn">volatility.registry</span> <span class="k">as</span> <span class="nn">registry</span>
+<span class="kn">import</span> <span class="nn">volatility.utils</span> <span class="k">as</span> <span class="nn">utils</span>
+
+<span class="n">registry</span><span class="o">.</span><span class="n">PluginImporter</span><span class="p">()</span>
+<span class="n">config</span> <span class="o">=</span> <span class="n">conf</span><span class="o">.</span><span class="n">ConfObject</span><span class="p">()</span>
+<span class="n">registry</span><span class="o">.</span><span class="n">register_global_options</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">addrspace</span><span class="o">.</span><span class="n">BaseAddressSpace</span><span class="p">)</span>
+<span class="n">config</span><span class="o">.</span><span class="n">parse_options</span><span class="p">()</span>
+<span class="n">config</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="s1">&#39;PROFILE&#39;</span><span class="p">,</span> <span class="s2">&quot;Win7SP1x64&quot;</span><span class="p">)</span>
+<span class="n">config</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="s1">&#39;LOCATION&#39;</span><span class="p">,</span> <span class="s2">&quot;file:///tmp/memdump_0x0-0x100000000_20160127-125924.bin&quot;</span><span class="p">)</span>
+<span class="n">config</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="s1">&#39;dtb&#39;</span><span class="p">,</span> <span class="mh">0x187000</span><span class="p">)</span>
+<span class="n">config</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="s1">&#39;kdbg&#39;</span><span class="p">,</span> <span class="mh">0xfffff80003a4d0a0</span><span class="p">)</span>
+<span class="n">config</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="s1">&#39;kpcr&#39;</span><span class="p">,</span> <span class="mh">0xfffff80003a4ed00</span><span class="p">)</span>
+<span class="n">addr_space</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">load_as</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+
+<span class="c1"># Try to read the page table from DTB</span>
+<span class="k">for</span> <span class="n">vaddr</span><span class="p">,</span> <span class="n">size</span> <span class="ow">in</span> <span class="n">addr_space</span><span class="o">.</span><span class="n">get_available_pages</span><span class="p">():</span>
+    <span class="c1"># Expand kernel virtual addresses</span>
+    <span class="k">if</span> <span class="n">vaddr</span> <span class="o">&amp;</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">47</span><span class="p">):</span>
+        <span class="n">vaddr</span> <span class="o">|=</span> <span class="mh">0xffff</span> <span class="o">&lt;&lt;</span> <span class="mi">48</span>
+    <span class="n">phy</span> <span class="o">=</span> <span class="n">addr_space</span><span class="o">.</span><span class="n">vtop</span><span class="p">(</span><span class="n">vaddr</span><span class="p">)</span>
+    <span class="c1"># only output something when the physical address is within 4GB</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">phy</span> <span class="o">&gt;&gt;</span> <span class="mi">32</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%16x</span><span class="s1"> (</span><span class="si">%6x</span><span class="s1">) -&gt; </span><span class="si">%x</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">vaddr</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">phy</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>In the result, there are some interesting things for people who enjoy learning low-level operating-system-related materials.</p>
+<p>First there is an identity mapping at <code class="docutils literal"><span class="pre">0xfffff800</span> <span class="pre">00000000</span></code>, which maps parts of the physical memory.
+For example:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">fffff80003800000</span> <span class="p">(</span><span class="mi">200000</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="mi">3800000</span>
+<span class="n">fffff80003a00000</span> <span class="p">(</span><span class="mi">200000</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="mi">3</span><span class="n">a00000</span> <span class="o">&lt;-</span> <span class="n">kdbdg</span> <span class="o">=</span> <span class="mh">0xf80003a4d0a0</span>
+<span class="n">fffff80003c00000</span> <span class="p">(</span><span class="mi">200000</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="mi">3</span><span class="n">c00000</span>
+<span class="n">fffff80003e00000</span> <span class="p">(</span><span class="mi">200000</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="mi">3</span><span class="n">e00000</span>
+</pre></div>
+</div>
+<p>Next there is a recursive mapping at <code class="docutils literal"><span class="pre">0xfffff6fb7dbed000</span></code>.
+It can be found because it maps to the DTB:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">fffff6fb7dbed000</span> <span class="p">(</span>  <span class="mi">1000</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="mi">187000</span>
+</pre></div>
+</div>
+<p>Moreover, this address is special regarding the page directory decomposition, where each entry is 9-bit long (an address has a 16-bit extension-bit prefix, 4 9-bit indexes and a 12-bit offset in a 4KB page, 16+4*9+12=64 bits):</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">fffff6fb7dbed000</span>
+    <span class="n">f68</span>          <span class="n">PGD</span> <span class="n">index</span> <span class="o">=</span> <span class="mh">0x1ed</span>
+      <span class="mi">7</span><span class="n">b4</span>        <span class="n">PUD</span> <span class="n">index</span> <span class="o">=</span> <span class="mh">0x1ed</span>
+        <span class="mi">3</span><span class="n">da</span>      <span class="n">PMD</span> <span class="n">index</span> <span class="o">=</span> <span class="mh">0x1ed</span>
+          <span class="mi">1</span><span class="n">ed</span>    <span class="n">PTE</span> <span class="n">index</span> <span class="o">=</span> <span class="mh">0x1ed</span>
+</pre></div>
+</div>
+<p>This is due to the fact that on Windows, entry 0x1ed is self-referential.
+This also means that addresses beginning with <code class="docutils literal"><span class="pre">fffff6</span></code> in the page table dump are associated to page directory structures.
+For example, the leaf containing the Page Table Entry (PTE) for virtual page <code class="docutils literal"><span class="pre">0xfffffffffffe0000</span></code> is:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ python -c &#39;print(hex((0xfffffffffffe0000 &amp; 0xfffffffff000) &gt;&gt; 9 | 0xfffff68000000000))&#39;
+0xfffff6ffffffff00
+</pre></div>
+</div>
+<p>The dump contains:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">fffff6fffffff000</span> <span class="p">(</span>  <span class="mi">1000</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="mi">1</span><span class="n">f4000</span>
+<span class="n">fffffffffffe0000</span> <span class="p">(</span>  <span class="mi">1000</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">fee00000</span>
+</pre></div>
+</div>
+<p>As <code class="docutils literal"><span class="pre">fffff6ffffffff00</span></code> is offset <code class="docutils literal"><span class="pre">f00</span></code> of page <code class="docutils literal"><span class="pre">fffff6fffffff000</span></code>, which is mapped to <code class="docutils literal"><span class="pre">1f4000</span></code>, the entry for <code class="docutils literal"><span class="pre">fffffffffffe0000</span></code> is the 8 bytes at <code class="docutils literal"><span class="pre">1f4f00</span></code>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">0001</span><span class="n">f4f00</span><span class="p">:</span> <span class="mi">7</span><span class="n">b01</span> <span class="n">e0fe</span> <span class="mi">0000</span> <span class="mi">0000</span>
+</pre></div>
+</div>
+<p>So the PTE is in <code class="docutils literal"><span class="pre">fee0017b</span></code>, which means &#8220;physical page <code class="docutils literal"><span class="pre">fee00000</span></code> with flags <code class="docutils literal"><span class="pre">17b</span></code>&#8221; (bits: 0=present, 1=writable, !2=non-userspace, 3=page write through, 4=page cache disabled, 5=accessed, 6=dirty, 8=global).</p>
+</div>
+</div>
+
+
+      </div>
+      <div class="bottomnav" role="navigation" aria-label="bottom navigation">
+      
+        <p>
+        «&#160;&#160;<a href="challenge1.html">Hack In Paris Challenge 1</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="challenge3.html">Hack In Paris Challenge 3</a>&#160;&#160;»
+        </p>
+
+      </div>
+
+  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="challenge3.html" title="Hack In Paris Challenge 3"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="challenge1.html" title="Hack In Paris Challenge 1"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">HIPChall 2016 write-up</a> &raquo;</li> 
+      </ul>
+    </div>
+  
+    <!-- Original code from http://tholman.com/github-corners/ -->
+    <a href="https://github.com/fishilico/hackinparis-2016" class="github-corner"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;">
+      <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+      <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+      <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path>
+    </svg></a>
+    <style>
+      .github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}
+      @keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}
+      @media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}
+    </style>
+  
+
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2016, Nicolas Iooss, beerware license.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.5.
+    </div>
+  </body>
+</html>

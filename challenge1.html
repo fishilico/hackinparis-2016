@@ -1,0 +1,229 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Hack In Paris Challenge 1 &mdash; HIPChall 2016 write-up</title>
+    
+    <link rel="stylesheet" href="_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="HIPChall 2016 write-up" href="index.html" />
+    <link rel="next" title="Hack In Paris Challenge 2" href="challenge2.html" />
+    <link rel="prev" title="Hack In Paris Challenge 2016 Write-Up" href="index.html" /> 
+  </head>
+  <body role="document">
+      <div class="header" role="banner"><h1 class="heading"><a href="index.html">
+          <span>HIPChall 2016 write-up</span></a></h1>
+        <h2 class="heading"><span>Hack In Paris Challenge 1</span></h2>
+      </div>
+      <div class="topnav" role="navigation" aria-label="top navigation">
+      
+        <p>
+        «&#160;&#160;<a href="index.html">Hack In Paris Challenge 2016 Write-Up</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="challenge2.html">Hack In Paris Challenge 2</a>&#160;&#160;»
+        </p>
+
+      </div>
+      <div class="content">
+        
+        
+  <div class="section" id="hack-in-paris-challenge-1">
+<h1>Hack In Paris Challenge 1<a class="headerlink" href="#hack-in-paris-challenge-1" title="Permalink to this headline">¶</a></h1>
+<p>The challenge began on Friday December, 18th 2015, with a <a class="reference external" href="https://twitter.com/hackinparis/status/677775353893515264">tweet</a>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>#HIPChall Number 1 : http://bit.ly/1YpnZnB
+A Throwing Star LAN Tap and Two #HIPGoldenTickets to win!
+Be the first, Be Fair play, Have Fun!
+</pre></div>
+</div>
+<p>This tweet indicates a web site, <a class="reference external" href="https://hackinparis.com/data/chall2016/">https://hackinparis.com/data/chall2016/</a>, which only contains a PNG image, <a class="reference external" href="https://hackinparis.com/data/chall2016/chall1.png">https://hackinparis.com/data/chall2016/chall1.png</a>:</p>
+<a class="reference internal image-reference" href="_images/chall1.png"><img alt="_images/chall1.png" src="_images/chall1.png" style="width: 198.5px; height: 275.0px;" /></a>
+<p>Wireshark reveals an unknown section named <code class="docutils literal"><span class="pre">vGNr</span></code>, containing:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">ixeas</span><span class="p">:</span><span class="o">//</span><span class="n">yddotyprujw</span><span class="o">.</span><span class="n">nzm</span><span class="o">/</span><span class="n">udue</span><span class="o">/</span><span class="n">nsaco2016</span><span class="o">/</span><span class="n">ef7118o5</span><span class="o">-</span><span class="n">p1au</span><span class="o">-</span><span class="mi">49</span><span class="n">g0</span><span class="o">-</span><span class="mi">84</span><span class="n">f7</span><span class="o">-</span><span class="mi">3850</span><span class="n">h4n21210</span><span class="o">.</span><span class="n">mie</span>
+</pre></div>
+</div>
+<p>This looks like an URL encrypted using a Vigenère cipher.
+By supposing the URL to begin with <code class="docutils literal"><span class="pre">https://hackinparis.com/</span></code>, it is very easy to find the encryption key.
+This can be accomplished for example with such a Python script.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
+
+<span class="c1"># Encrypted data from the PNG image</span>
+<span class="n">TEXT</span> <span class="o">=</span> <span class="n">b</span><span class="s1">&#39;ixeas://yddotyprujw.nzm/udue/nsaco2016/ef7118o5-p1au-49g0-84f7-3850h4n21210.mie&#39;</span>
+
+<span class="c1"># Begin of the clear text</span>
+<span class="n">BEGIN</span> <span class="o">=</span> <span class="n">b</span><span class="s1">&#39;httpshackinpariscom&#39;</span>
+
+<span class="n">STRIPPEDTEXT</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">TEXT</span> <span class="k">if</span> <span class="nb">ord</span><span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">c</span> <span class="o">&lt;=</span> <span class="nb">ord</span><span class="p">(</span><span class="s1">&#39;z&#39;</span><span class="p">)]</span>
+<span class="n">KEY</span> <span class="o">=</span> <span class="p">[(</span><span class="n">STRIPPEDTEXT</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">BEGIN</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="mi">26</span><span class="p">)</span> <span class="o">%</span> <span class="mi">26</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">BEGIN</span><span class="p">))]</span>
+
+<span class="c1"># Show key: bellardbellardbella -&gt; bellard</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Key is: &#39;</span> <span class="o">+</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">chr</span><span class="p">(</span><span class="nb">ord</span><span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">k</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">KEY</span><span class="p">))</span>
+
+<span class="n">KEY</span> <span class="o">=</span> <span class="n">KEY</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="s1">&#39;bellard&#39;</span><span class="p">)]</span>
+
+<span class="n">decrypted</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">pos</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">TEXT</span><span class="p">:</span>
+    <span class="k">if</span> <span class="nb">ord</span><span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">c</span> <span class="o">&lt;=</span> <span class="nb">ord</span><span class="p">(</span><span class="s1">&#39;z&#39;</span><span class="p">):</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="p">((</span><span class="n">c</span> <span class="o">-</span> <span class="nb">ord</span><span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="o">-</span> <span class="n">KEY</span><span class="p">[</span><span class="n">pos</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">KEY</span><span class="p">)]</span> <span class="o">+</span> <span class="mi">260</span><span class="p">)</span> <span class="o">%</span> <span class="mi">26</span><span class="p">)</span> <span class="o">+</span> <span class="nb">ord</span><span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">)</span>
+        <span class="n">pos</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">c</span>
+    <span class="n">decrypted</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;decrypted: &#39;</span> <span class="o">+</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">chr</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">decrypted</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>The encryption key is <code class="docutils literal"><span class="pre">bellard</span></code> and the decrypted URL <a class="reference external" href="https://hackinparis.com/data/chall2016/db7118d5-e1ad-49d0-84e7-3850d4c21210.bin">https://hackinparis.com/data/chall2016/db7118d5-e1ad-49d0-84e7-3850d4c21210.bin</a>.
+Here is the output of some commands:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ file db7118d5-e1ad-49d0-84e7-3850d4c21210.bin
+db7118d5-e1ad-49d0-84e7-3850d4c21210.bin: BPG (Better Portable Graphics)
+
+$ strings -tx -7 db7118d5-e1ad-49d0-84e7-3850d4c21210.bin
+    151 RUItUEMtQ0lEQ0JFiesabi46
+    222 __main__s
+    24e structR
+    28e __name__t
+    29b decodet
+    2ac raw_inputt
+    2cb encode(
+    2ee &lt;module&gt;
+    85e #Fr 3/J
+    922 %%o\;Sb
+</pre></div>
+</div>
+<p>So the file is a BPG image with some Python code embedded.
+Using the specification (<a class="reference external" href="http://bellard.org/bpg/bpg_spec.txt">http://bellard.org/bpg/bpg_spec.txt</a>), here is the decode header:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Offset</span>  <span class="n">Hex</span> <span class="n">data</span>    <span class="n">Field</span> <span class="n">name</span>                  <span class="n">Description</span>
+<span class="o">------</span>  <span class="o">----------</span>  <span class="o">--------------------------</span>  <span class="o">------------</span>
+    <span class="mi">0</span>   <span class="mi">425047</span><span class="n">fb</span>    <span class="n">file_magic</span>                  <span class="s2">&quot;BPG</span><span class="se">\xfb</span><span class="s2">&quot;</span>
+    <span class="mi">4</span>   <span class="mi">20</span>          <span class="n">pixel_format</span> <span class="p">(</span><span class="mi">3</span> <span class="n">bits</span><span class="p">)</span>       <span class="mi">1</span><span class="p">:</span> <span class="mi">4</span><span class="p">:</span><span class="mi">2</span><span class="p">:</span><span class="mf">0.</span> <span class="n">Chroma</span> <span class="n">at</span> <span class="n">position</span> <span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span> <span class="p">(</span><span class="n">JPEG</span> <span class="n">chroma</span> <span class="n">position</span><span class="p">)</span>
+                    <span class="n">alpha1_flag</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span>             <span class="mi">0</span><span class="p">:</span> <span class="n">no</span> <span class="n">alpha</span> <span class="n">plane</span>
+                    <span class="n">bit_depth_minus_8</span> <span class="p">(</span><span class="mi">4</span><span class="p">)</span>       <span class="mi">0</span><span class="p">:</span> <span class="n">bit</span> <span class="n">depth</span> <span class="ow">is</span> <span class="mi">8</span>
+    <span class="mi">5</span>   <span class="mi">08</span>          <span class="n">color_space</span> <span class="p">(</span><span class="mi">4</span><span class="p">)</span>             <span class="mi">0</span>
+                    <span class="n">extension_present_flag</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span>  <span class="mi">1</span><span class="p">:</span> <span class="n">there</span> <span class="ow">is</span> <span class="n">extension</span> <span class="n">data</span>
+                    <span class="n">alpha2_flag</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span>             <span class="mi">0</span>
+                    <span class="n">limited_range_flag</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span>      <span class="mi">0</span>
+                    <span class="n">animation_flag</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span>          <span class="mi">0</span>
+    <span class="mi">6</span>   <span class="mi">8310</span>        <span class="n">picture_width</span>               <span class="n">Width</span> <span class="mh">0x190</span> <span class="o">=</span> <span class="mi">400</span>
+    <span class="mi">8</span>   <span class="mi">8240</span>        <span class="n">picture_height</span>              <span class="n">Height</span> <span class="mh">0x140</span> <span class="o">=</span> <span class="mi">320</span>
+    <span class="n">a</span>   <span class="mi">00</span>          <span class="n">picture_data_length</span>
+    <span class="n">b</span>   <span class="mi">8616</span>        <span class="n">extension_data_length</span>       <span class="n">Extension</span> <span class="n">data</span> <span class="n">Length</span> <span class="o">=</span> <span class="mh">0x316</span>
+    <span class="n">d</span>   <span class="mi">00</span>          <span class="n">first</span> <span class="n">extension_tag</span>
+    <span class="n">e</span>   <span class="mi">8613</span>        <span class="n">first</span> <span class="n">extension_tag_length</span>  <span class="n">First</span> <span class="n">tag</span> <span class="n">length</span> <span class="o">=</span> <span class="mh">0x313</span> <span class="o">=</span> <span class="mi">787</span>
+</pre></div>
+</div>
+<p>Let&#8217;s extract the extension tag, which is 787 bytes from offset 0x10:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ dd if=db7118d5-e1ad-49d0-84e7-3850d4c21210.bin of=bpgdata.bin skip=16 count=787 bs=1
+787+0 records in
+787+0 records out
+787 bytes copied, 0.00316447 s, 249 kB/s
+
+$ file bpgdata.bin
+bpgdata.bin: python 2.7 byte-compiled
+</pre></div>
+</div>
+<p>Using uncompyle2 (<a class="reference external" href="https://github.com/wibiti/uncompyle2">https://github.com/wibiti/uncompyle2</a>) leads to the following Python code:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1">#Embedded file name: _.py</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">struct</span> <span class="kn">import</span> <span class="n">pack</span>
+<span class="n">A</span> <span class="o">=</span> <span class="s1">&#39;RUItUEMtQ0lEQ0JF&#39;</span>
+<span class="n">B</span> <span class="o">=</span> <span class="mi">1650553701</span>
+<span class="n">C</span> <span class="o">=</span> <span class="mi">13876</span>
+<span class="n">D</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\xd5\x81\xd4</span><span class="s1">m</span><span class="se">\x84\xf3\x84\x99\xf4\xf3\x82</span><span class="s1">m</span><span class="se">\xf7\x99\xf4\x94\xa2</span><span class="s1">m</span><span class="se">\x99\x85\x88\xa3\xf0\x95\xc1</span><span class="s1">&#39;</span>
+<span class="n">E</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\xc3\x96\x95\x87\x99\x81\xa3\xa9</span><span class="s1">k@</span><span class="se">\x95\x96\xa6</span><span class="s1">@</span><span class="se">\xa2\x85\x95\x84</span><span class="s1">@</span><span class="se">\xa3\x88\x89\xa2</span><span class="s1">@</span><span class="se">\x97\x81\xa2\xa2\xa6\x96\x99\x84</span><span class="s1">@</span><span class="se">\xa3\x96</span><span class="s1">z@</span><span class="se">\x94\x85\x99\x85\x95\xa6\x85\x95</span><span class="s1">@`</span><span class="se">\x81\xa3</span><span class="s1">`@</span><span class="se">\x88\x81\x83\x92\x89\x95\x97\x81\x99\x89\xa2</span><span class="s1">@`</span><span class="se">\x84\x96\xa3</span><span class="s1">`@</span><span class="se">\x83\x96\x94</span><span class="s1">@O&#39;</span>
+<span class="n">F</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\xd5\x96\x97\x85</span><span class="s1">&#39;</span>
+<span class="n">G</span> <span class="o">=</span> <span class="s1">&#39;LLL@</span><span class="se">\xc8\x81\x83\x92\xc9\x95\xd7\x81\x99\x89\xa2</span><span class="s1">@</span><span class="se">\xf2\xf0\xf1\xf6</span><span class="s1">@`@</span><span class="se">\xc3\x88\x81\x93\x93</span><span class="s1">@</span><span class="se">\xf1</span><span class="s1">@nnn&#39;</span>
+<span class="n">H</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\xc5\x95\xa3\x85\x99</span><span class="s1">@</span><span class="se">\x97\x81\xa2\xa2\xa6\x96\x99\x84</span><span class="s1">z@&#39;</span>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">I</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">pack</span><span class="p">(</span><span class="s1">&#39;&gt;IH&#39;</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">))[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">print</span> <span class="n">G</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">I</span><span class="p">)</span>
+    <span class="k">print</span> <span class="s1">&#39;&#39;</span>
+    <span class="n">code</span> <span class="o">=</span> <span class="nb">raw_input</span><span class="p">(</span><span class="n">H</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">I</span><span class="p">))</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">code</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">code</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">I</span><span class="p">)</span> <span class="o">==</span> <span class="n">D</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="k">print</span> <span class="n">E</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">I</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">print</span> <span class="n">F</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">I</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Adding some print statements allows to quickly discover the content of variables:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">pack</span><span class="p">(</span><span class="s1">&#39;&gt;IH&#39;</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">)</span> <span class="o">=</span> <span class="s1">&#39;base64&#39;</span>
+<span class="n">I</span> <span class="o">=</span> <span class="s1">&#39;EBCDIC-CP-BE&#39;</span>
+<span class="n">G</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">I</span><span class="p">)</span> <span class="o">=</span> <span class="s1">&#39;&lt;&lt;&lt; HackInParis 2016 - Chall 1 &gt;&gt;&gt;&#39;</span>
+<span class="n">H</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">I</span><span class="p">)</span> <span class="o">=</span> <span class="s1">&#39;Enter password: &#39;</span>
+<span class="n">E</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">I</span><span class="p">)</span> <span class="o">=</span> <span class="s1">&#39;Congratz, now send this password to: merenwen -at- hackinparis -dot- com !&#39;</span>
+<span class="n">F</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">I</span><span class="p">)</span> <span class="o">=</span> <span class="s1">&#39;Nope&#39;</span>
+<span class="n">D</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">I</span><span class="p">)</span> <span class="o">=</span> <span class="s1">&#39;An0ther_sm4r7_b34rd3d_MaN&#39;</span>
+</pre></div>
+</div>
+<p>The flag of the first challenge is thus: <strong>An0ther_sm4r7_b34rd3d_MaN</strong></p>
+</div>
+
+
+      </div>
+      <div class="bottomnav" role="navigation" aria-label="bottom navigation">
+      
+        <p>
+        «&#160;&#160;<a href="index.html">Hack In Paris Challenge 2016 Write-Up</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="challenge2.html">Hack In Paris Challenge 2</a>&#160;&#160;»
+        </p>
+
+      </div>
+
+  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="challenge2.html" title="Hack In Paris Challenge 2"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Hack In Paris Challenge 2016 Write-Up"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">HIPChall 2016 write-up</a> &raquo;</li> 
+      </ul>
+    </div>
+  
+    <!-- Original code from http://tholman.com/github-corners/ -->
+    <a href="https://github.com/fishilico/hackinparis-2016" class="github-corner"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;">
+      <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+      <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+      <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path>
+    </svg></a>
+    <style>
+      .github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}
+      @keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}
+      @media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}
+    </style>
+  
+
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2016, Nicolas Iooss, beerware license.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.5.
+    </div>
+  </body>
+</html>

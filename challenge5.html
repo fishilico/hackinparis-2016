@@ -1,0 +1,591 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Hack In Paris Challenge 5 &mdash; HIPChall 2016 write-up</title>
+    
+    <link rel="stylesheet" href="_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="HIPChall 2016 write-up" href="index.html" />
+    <link rel="prev" title="Hack In Paris Challenge 4" href="challenge4.html" /> 
+  </head>
+  <body role="document">
+      <div class="header" role="banner"><h1 class="heading"><a href="index.html">
+          <span>HIPChall 2016 write-up</span></a></h1>
+        <h2 class="heading"><span>Hack In Paris Challenge 5</span></h2>
+      </div>
+      <div class="topnav" role="navigation" aria-label="top navigation">
+      
+        <p>
+        «&#160;&#160;<a href="challenge4.html">Hack In Paris Challenge 4</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        </p>
+
+      </div>
+      <div class="content">
+        
+        
+  <div class="section" id="hack-in-paris-challenge-5">
+<h1>Hack In Paris Challenge 5<a class="headerlink" href="#hack-in-paris-challenge-5" title="Permalink to this headline">¶</a></h1>
+<p>The challenge began on Friday May, 20th, with a <a class="reference external" href="https://twitter.com/hackinparis/status/733687357233352704">tweet</a>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>#HIPChall n°5 is on!
+#BeagleBoneBlack &amp; 2 #goldenticket for #HIP16
+Hack, Love, Share, &amp; enjoy!
+https://hackinparis.com/challenge-5.html …
+</pre></div>
+</div>
+<p>The web page contains this message:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>Hi!
+
+I was following a white rabbit but I&#39;ve lost it.
+Can you find it for me?
+
+Alice
+
+https://hackinparis.com/data/chall2016/step-5/chall.img
+
+md5:    351804dc726752fda5db3fe69f6c5c34
+sha256:    078a5cd5a40e320f0811ef99644e19c5825d81818aa517c6d771860124de3577
+
+Please send your conclusions (and the validation flag) to merenwen@hackinparis.com
+</pre></div>
+</div>
+<p><code class="docutils literal"><span class="pre">chall.img</span></code> is a FAT32 filesystem labeled <code class="docutils literal"><span class="pre">challHIP</span></code> which contains many useless files and a GIF image:</p>
+<img alt="_images/Nothing_to_find_here.gif" src="_images/Nothing_to_find_here.gif" />
+<p>Binwalk spots a ZIP archive in this mess:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ binwalk chall.img
+
+DECIMAL       HEXADECIMAL     DESCRIPTION
+--------------------------------------------------------------------------------
+1320448       0x142600        GIF image data, version &quot;89a&quot;, 350 x 260
+2720256       0x298200        Zip archive data, at least v2.0 to extract, compressed size: 18046268, uncompressed size: 22653106, name: file1
+20766587      0x13CDF7B       Zip archive data, at least v2.0 to extract, compressed size: 247210, uncompressed size: 281973, name: file2
+21013860      0x140A564       Zip archive data, at least v2.0 to extract, compressed size: 4067, uncompressed size: 13383, name: step1.bin
+21018223      0x140B66F       End of Zip archive
+49586962      0x2F4A312       MySQL MISAM compressed data file Version 7
+50839721      0x307C0A9       Certificate in DER format (x509 v3), header length: 4, sequence length: 9733
+</pre></div>
+</div>
+<p>Let&#8217;s extract this 18 MB archive!</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ dd if=chall.img of=chall.zip bs=1 skip=$((0x298200)) count=$((0x0140b684-0x298200+16))
+$ unzip chall.zip
+Archive:  chall.zip
+  inflating: file1
+  inflating: file2
+  inflating: step1.bin
+</pre></div>
+</div>
+<div class="section" id="step1-bin">
+<h2><code class="docutils literal"><span class="pre">step1.bin</span></code><a class="headerlink" href="#step1-bin" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal"><span class="pre">step1.bin</span></code> is a Linux program which is very simple to reverse-engineer as it contains all its symbol.
+The analysis of <code class="docutils literal"><span class="pre">main()</span></code> (at <code class="docutils literal"><span class="pre">.text:4010F3</span></code>) reveals that this programs can decrypt files which either begin with &#8220;Keep me please&#8221; or &#8220;Keep me too&#8221;.
+As life is well done, the two other files which are part of the initial ZIP archive match these patterns:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ xxd file1 |head -n1
+00000000: 4b65 6570 206d 6520 706c 6561 7365 135b  Keep me please.[
+
+$ xxd file2 |head -n1
+00000000: 4b65 6570 206d 6520 746f 6f50 2f4b 2a77  Keep me tooP/K*w
+</pre></div>
+</div>
+<p>The first file is decrypted with function <code class="docutils literal"><span class="pre">decryptSimple()</span></code> at <code class="docutils literal"><span class="pre">.text:40095D</span></code>.
+This function verifies that the key given to the program satisfies a set of basic equations and then decrypt the data.
+It is possible to solve the equations by hand.
+It is also possible to use <code class="docutils literal"><span class="pre">z3</span></code> to kindly ask the computer to find the key:</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python2</span>
+<span class="kn">import</span> <span class="nn">z3</span>
+
+<span class="c1"># Initialize unknown key</span>
+<span class="n">key</span> <span class="o">=</span> <span class="n">z3</span><span class="o">.</span><span class="n">BitVec</span><span class="p">(</span><span class="s1">&#39;K&#39;</span><span class="p">,</span> <span class="mh">0x18</span> <span class="o">*</span> <span class="mi">8</span><span class="p">)</span>
+<span class="n">BYTE_key</span> <span class="o">=</span> <span class="p">[</span><span class="n">z3</span><span class="o">.</span><span class="n">Extract</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">7</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">key</span><span class="o">.</span><span class="n">size</span><span class="p">(),</span> <span class="mi">8</span><span class="p">)]</span>
+
+<span class="c1"># Translate decryptSimple() instruction to z3 equations</span>
+<span class="n">s</span> <span class="o">=</span> <span class="n">z3</span><span class="o">.</span><span class="n">Solver</span><span class="p">()</span>
+<span class="n">s</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">BYTE_key</span><span class="p">[</span><span class="mh">0x15</span><span class="p">]</span> <span class="o">^</span> <span class="n">BYTE_key</span><span class="p">[</span><span class="mh">0x16</span><span class="p">]</span> <span class="o">==</span> <span class="n">BYTE_key</span><span class="p">[</span><span class="mh">0x17</span><span class="p">]</span> <span class="o">+</span> <span class="mh">0x1D</span><span class="p">)</span>
+<span class="n">s</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">BYTE_key</span><span class="p">[</span><span class="mh">0x14</span><span class="p">]</span> <span class="o">^</span> <span class="n">BYTE_key</span><span class="p">[</span><span class="mh">0x15</span><span class="p">]</span> <span class="o">==</span> <span class="n">BYTE_key</span><span class="p">[</span><span class="mh">0x16</span><span class="p">]</span> <span class="o">-</span> <span class="mh">0x69</span><span class="p">)</span>
+<span class="n">s</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">BYTE_key</span><span class="p">[</span><span class="mh">0x13</span><span class="p">]</span> <span class="o">^</span> <span class="n">BYTE_key</span><span class="p">[</span><span class="mh">0x14</span><span class="p">]</span> <span class="o">==</span> <span class="n">BYTE_key</span><span class="p">[</span><span class="mh">0x15</span><span class="p">]</span> <span class="o">-</span> <span class="mh">0x69</span><span class="p">)</span>
+<span class="n">s</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">BYTE_key</span><span class="p">[</span><span class="mh">0x12</span><span class="p">]</span> <span class="o">^</span> <span class="n">BYTE_key</span><span class="p">[</span><span class="mh">0x13</span><span class="p">]</span> <span class="o">==</span> <span class="n">BYTE_key</span><span class="p">[</span><span class="mh">0x14</span><span class="p">]</span> <span class="o">-</span> <span class="mh">0x0C</span><span class="p">)</span>
+<span class="n">s</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">BYTE_key</span><span class="p">[</span><span class="mh">0x11</span><span class="p">]</span> <span class="o">^</span> <span class="n">BYTE_key</span><span class="p">[</span><span class="mh">0x12</span><span class="p">]</span> <span class="o">==</span> <span class="n">BYTE_key</span><span class="p">[</span><span class="mh">0x13</span><span class="p">]</span> <span class="o">+</span> <span class="mi">4</span><span class="p">)</span>
+<span class="n">s</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">BYTE_key</span><span class="p">[</span><span class="mh">0x10</span><span class="p">]</span> <span class="o">^</span> <span class="n">BYTE_key</span><span class="p">[</span><span class="mh">0x11</span><span class="p">]</span> <span class="o">==</span> <span class="n">BYTE_key</span><span class="p">[</span><span class="mh">0x12</span><span class="p">]</span> <span class="o">-</span> <span class="mh">0x27</span><span class="p">)</span>
+<span class="n">s</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">BYTE_key</span><span class="p">[</span><span class="mh">0x0F</span><span class="p">]</span> <span class="o">^</span> <span class="n">BYTE_key</span><span class="p">[</span><span class="mh">0x10</span><span class="p">]</span> <span class="o">==</span> <span class="n">BYTE_key</span><span class="p">[</span><span class="mh">0x11</span><span class="p">]</span> <span class="o">-</span> <span class="mh">0x18</span><span class="p">)</span>
+<span class="n">s</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">BYTE_key</span><span class="p">[</span><span class="mh">0x0E</span><span class="p">]</span> <span class="o">^</span> <span class="n">BYTE_key</span><span class="p">[</span><span class="mh">0x0F</span><span class="p">]</span> <span class="o">==</span> <span class="n">BYTE_key</span><span class="p">[</span><span class="mh">0x10</span><span class="p">]</span> <span class="o">-</span> <span class="mh">0x4E</span><span class="p">)</span>
+<span class="n">s</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">BYTE_key</span><span class="p">[</span><span class="mh">0x0D</span><span class="p">]</span> <span class="o">^</span> <span class="n">BYTE_key</span><span class="p">[</span><span class="mh">0x0E</span><span class="p">]</span> <span class="o">==</span> <span class="n">BYTE_key</span><span class="p">[</span><span class="mh">0x0F</span><span class="p">]</span> <span class="o">-</span> <span class="mh">0x48</span><span class="p">)</span>
+<span class="n">s</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">BYTE_key</span><span class="p">[</span><span class="mh">0x0C</span><span class="p">]</span> <span class="o">^</span> <span class="n">BYTE_key</span><span class="p">[</span><span class="mh">0x0D</span><span class="p">]</span> <span class="o">==</span> <span class="n">BYTE_key</span><span class="p">[</span><span class="mh">0x0E</span><span class="p">]</span> <span class="o">-</span> <span class="mh">0x73</span><span class="p">)</span>
+<span class="n">s</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">BYTE_key</span><span class="p">[</span><span class="mh">0x0B</span><span class="p">]</span> <span class="o">^</span> <span class="n">BYTE_key</span><span class="p">[</span><span class="mh">0x0C</span><span class="p">]</span> <span class="o">==</span> <span class="n">BYTE_key</span><span class="p">[</span><span class="mh">0x0D</span><span class="p">]</span> <span class="o">-</span> <span class="mh">0x2A</span><span class="p">)</span>
+<span class="n">s</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">BYTE_key</span><span class="p">[</span><span class="mh">0x0A</span><span class="p">]</span> <span class="o">^</span> <span class="n">BYTE_key</span><span class="p">[</span><span class="mh">0x0B</span><span class="p">]</span> <span class="o">==</span> <span class="n">BYTE_key</span><span class="p">[</span><span class="mh">0x0C</span><span class="p">]</span> <span class="o">-</span> <span class="mh">0x60</span><span class="p">)</span>
+<span class="n">s</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">BYTE_key</span><span class="p">[</span><span class="mh">0x09</span><span class="p">]</span> <span class="o">^</span> <span class="n">BYTE_key</span><span class="p">[</span><span class="mh">0x0A</span><span class="p">]</span> <span class="o">==</span> <span class="n">BYTE_key</span><span class="p">[</span><span class="mh">0x0B</span><span class="p">]</span> <span class="o">-</span> <span class="mh">0x1D</span><span class="p">)</span>
+<span class="n">s</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">BYTE_key</span><span class="p">[</span><span class="mh">0x08</span><span class="p">]</span> <span class="o">^</span> <span class="n">BYTE_key</span><span class="p">[</span><span class="mh">0x09</span><span class="p">]</span> <span class="o">==</span> <span class="n">BYTE_key</span><span class="p">[</span><span class="mh">0x0A</span><span class="p">]</span> <span class="o">-</span> <span class="mh">0x52</span><span class="p">)</span>
+<span class="n">s</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">BYTE_key</span><span class="p">[</span><span class="mh">0x07</span><span class="p">]</span> <span class="o">^</span> <span class="n">BYTE_key</span><span class="p">[</span><span class="mh">0x08</span><span class="p">]</span> <span class="o">==</span> <span class="n">BYTE_key</span><span class="p">[</span><span class="mh">0x09</span><span class="p">]</span> <span class="o">-</span> <span class="mi">6</span><span class="p">)</span>
+<span class="n">s</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">BYTE_key</span><span class="p">[</span><span class="mh">0x06</span><span class="p">]</span> <span class="o">^</span> <span class="n">BYTE_key</span><span class="p">[</span><span class="mh">0x07</span><span class="p">]</span> <span class="o">==</span> <span class="n">BYTE_key</span><span class="p">[</span><span class="mh">0x08</span><span class="p">])</span>
+<span class="n">s</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">BYTE_key</span><span class="p">[</span><span class="mh">0x05</span><span class="p">]</span> <span class="o">^</span> <span class="n">BYTE_key</span><span class="p">[</span><span class="mh">0x06</span><span class="p">]</span> <span class="o">==</span> <span class="n">BYTE_key</span><span class="p">[</span><span class="mh">0x07</span><span class="p">]</span> <span class="o">-</span> <span class="mh">0x0F</span><span class="p">)</span>
+<span class="n">s</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">BYTE_key</span><span class="p">[</span><span class="mh">0x04</span><span class="p">]</span> <span class="o">^</span> <span class="n">BYTE_key</span><span class="p">[</span><span class="mh">0x05</span><span class="p">]</span> <span class="o">==</span> <span class="n">BYTE_key</span><span class="p">[</span><span class="mh">0x06</span><span class="p">]</span> <span class="o">-</span> <span class="mh">0x47</span><span class="p">)</span>
+<span class="n">s</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">BYTE_key</span><span class="p">[</span><span class="mh">0x03</span><span class="p">]</span> <span class="o">^</span> <span class="n">BYTE_key</span><span class="p">[</span><span class="mh">0x04</span><span class="p">]</span> <span class="o">==</span> <span class="n">BYTE_key</span><span class="p">[</span><span class="mh">0x05</span><span class="p">]</span> <span class="o">-</span> <span class="mh">0x74</span><span class="p">)</span>
+<span class="n">s</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">BYTE_key</span><span class="p">[</span><span class="mh">0x02</span><span class="p">]</span> <span class="o">^</span> <span class="n">BYTE_key</span><span class="p">[</span><span class="mh">0x03</span><span class="p">]</span> <span class="o">==</span> <span class="n">BYTE_key</span><span class="p">[</span><span class="mh">0x04</span><span class="p">]</span> <span class="o">-</span> <span class="mh">0x6F</span><span class="p">)</span>
+<span class="n">s</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">BYTE_key</span><span class="p">[</span><span class="mh">0x01</span><span class="p">]</span> <span class="o">^</span> <span class="n">BYTE_key</span><span class="p">[</span><span class="mh">0x02</span><span class="p">]</span> <span class="o">==</span> <span class="n">BYTE_key</span><span class="p">[</span><span class="mh">0x03</span><span class="p">]</span> <span class="o">-</span> <span class="mh">0x10</span><span class="p">)</span>
+<span class="n">s</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">BYTE_key</span><span class="p">[</span><span class="mh">0x00</span><span class="p">]</span> <span class="o">^</span> <span class="n">BYTE_key</span><span class="p">[</span><span class="mh">0x01</span><span class="p">]</span> <span class="o">==</span> <span class="n">BYTE_key</span><span class="p">[</span><span class="mh">0x02</span><span class="p">]</span> <span class="o">+</span> <span class="mh">0x0A</span><span class="p">)</span>
+<span class="n">s</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">BYTE_key</span><span class="p">[</span><span class="mh">0x01</span><span class="p">]</span> <span class="o">+</span> <span class="n">BYTE_key</span><span class="p">[</span><span class="mh">0x00</span><span class="p">]</span> <span class="o">==</span> <span class="mh">0x76</span><span class="p">)</span>
+<span class="n">s</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">BYTE_key</span><span class="p">[</span><span class="mh">0x00</span><span class="p">]</span> <span class="o">==</span> <span class="mh">0x46</span><span class="p">)</span>
+
+<span class="c1"># Find all solutions</span>
+<span class="k">while</span> <span class="n">s</span><span class="o">.</span><span class="n">check</span><span class="p">()</span> <span class="o">==</span> <span class="n">z3</span><span class="o">.</span><span class="n">sat</span><span class="p">:</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">model</span><span class="p">()</span>
+    <span class="n">keyval</span> <span class="o">=</span> <span class="n">m</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">as_long</span><span class="p">()</span>
+    <span class="n">s</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">key</span> <span class="o">!=</span> <span class="n">keyval</span><span class="p">)</span>
+    <span class="n">keybytes</span> <span class="o">=</span> <span class="n">b</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">chr</span><span class="p">((</span><span class="n">keyval</span> <span class="o">&gt;&gt;</span> <span class="n">i</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0xff</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">key</span><span class="o">.</span><span class="n">size</span><span class="p">(),</span> <span class="mi">8</span><span class="p">)])</span>
+    <span class="nb">print</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">keybytes</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>The output of this Python program is:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="s1">&#39;F0llow_7he_White_R4bbit</span><span class="se">\x00</span><span class="s1">&#39;</span>
+</pre></div>
+</div>
+<p>To decrypt <code class="docutils literal"><span class="pre">file1</span></code> all what is needed is to run <code class="docutils literal"><span class="pre">step1.bin</span></code>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ ./step1.bin file1 F0llow_7he_White_R4bbit 2&gt; file1_decrypted.out.b64
+Would you like some wine?
+
+$ base64 -d file1_decrypted.out.b64 &gt; file1_decrypted.out
+$ file file1_decrypted.out
+file1_decrypted.out: RIFF (little-endian) data, AVI, 1280 x 820, ~24 fps,
+video: FFMpeg MPEG-4, audio: MPEG-1 Layer 3 (stereo, 44100 Hz)
+</pre></div>
+</div>
+<p>The function <code class="docutils literal"><span class="pre">decryptMoreComplex()</span></code> at <code class="docutils literal"><span class="pre">.text:400F49</span></code> is a more complex: it computes the <code class="docutils literal"><span class="pre">crypt()</span></code> hash of the encryption key with two algorithms and salts (<code class="docutils literal"><span class="pre">$6$4Fz7Ehwg$</span></code> and <code class="docutils literal"><span class="pre">$1$4Fz7Ehwg$</span></code>) and uses the results to xor the file.
+Nevertheless if the decrypted file is a base64-encode file like <code class="docutils literal"><span class="pre">file1</span></code>, it is possible to crack this algorithm using z3:</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python2</span>
+<span class="kn">import</span> <span class="nn">z3</span>
+
+<span class="c1"># Read file2&#39;s encrypted data</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;file2&#39;</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+<span class="k">assert</span> <span class="n">data</span><span class="p">[:</span><span class="mh">0xb</span><span class="p">]</span> <span class="o">==</span> <span class="n">b</span><span class="s1">&#39;Keep me too&#39;</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mh">0xb</span><span class="p">:]</span>
+
+<span class="c1"># Define the set of valid bytes in the base64 cleartext file</span>
+<span class="n">VALID_BYTES</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">(</span>
+    <span class="p">[</span><span class="nb">ord</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="s1">&#39;</span><span class="se">\r\n</span><span class="s1">/+=&#39;</span><span class="p">]</span> <span class="o">+</span>
+    <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">ord</span><span class="p">(</span><span class="s1">&#39;0&#39;</span><span class="p">),</span> <span class="nb">ord</span><span class="p">(</span><span class="s1">&#39;9&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span> <span class="o">+</span>
+    <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">ord</span><span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">),</span> <span class="nb">ord</span><span class="p">(</span><span class="s1">&#39;Z&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span> <span class="o">+</span>
+    <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">ord</span><span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">),</span> <span class="nb">ord</span><span class="p">(</span><span class="s1">&#39;z&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)))</span>
+
+
+<span class="c1"># Define the two crypt() results as unknown variables with conditions</span>
+<span class="k">def</span> <span class="nf">z3_crypt_b64</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return a z3 expression of val being a base64 character from crypt()&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">z3</span><span class="o">.</span><span class="n">Or</span><span class="p">(</span>
+        <span class="n">z3</span><span class="o">.</span><span class="n">And</span><span class="p">(</span><span class="nb">ord</span><span class="p">(</span><span class="s1">&#39;0&#39;</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">val</span><span class="p">,</span> <span class="n">val</span> <span class="o">&lt;=</span> <span class="nb">ord</span><span class="p">(</span><span class="s1">&#39;9&#39;</span><span class="p">)),</span>
+        <span class="n">z3</span><span class="o">.</span><span class="n">And</span><span class="p">(</span><span class="nb">ord</span><span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">val</span><span class="p">,</span> <span class="n">val</span> <span class="o">&lt;=</span> <span class="nb">ord</span><span class="p">(</span><span class="s1">&#39;Z&#39;</span><span class="p">)),</span>
+        <span class="n">z3</span><span class="o">.</span><span class="n">And</span><span class="p">(</span><span class="nb">ord</span><span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">val</span><span class="p">,</span> <span class="n">val</span> <span class="o">&lt;=</span> <span class="nb">ord</span><span class="p">(</span><span class="s1">&#39;z&#39;</span><span class="p">)),</span>
+        <span class="n">val</span> <span class="o">==</span> <span class="nb">ord</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">),</span>
+        <span class="n">val</span> <span class="o">==</span> <span class="nb">ord</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">))</span>
+
+
+<span class="n">s</span> <span class="o">=</span> <span class="n">z3</span><span class="o">.</span><span class="n">Solver</span><span class="p">()</span>
+<span class="n">hash_alg1</span> <span class="o">=</span> <span class="n">z3</span><span class="o">.</span><span class="n">BitVec</span><span class="p">(</span><span class="s1">&#39;hash1&#39;</span><span class="p">,</span> <span class="mi">8</span> <span class="o">*</span> <span class="mi">22</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">hash_alg1</span><span class="o">.</span><span class="n">size</span><span class="p">(),</span> <span class="mi">8</span><span class="p">):</span>
+    <span class="n">s</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">z3_crypt_b64</span><span class="p">(</span><span class="n">z3</span><span class="o">.</span><span class="n">Extract</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">7</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">hash_alg1</span><span class="p">)))</span>
+<span class="n">hash_alg6</span> <span class="o">=</span> <span class="n">z3</span><span class="o">.</span><span class="n">BitVec</span><span class="p">(</span><span class="s1">&#39;alg6&#39;</span><span class="p">,</span> <span class="mi">8</span> <span class="o">*</span> <span class="mi">86</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">hash_alg6</span><span class="o">.</span><span class="n">size</span><span class="p">(),</span> <span class="mi">8</span><span class="p">):</span>
+    <span class="n">s</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">z3_crypt_b64</span><span class="p">(</span><span class="n">z3</span><span class="o">.</span><span class="n">Extract</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">7</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">hash_alg6</span><span class="p">)))</span>
+
+<span class="c1"># key = hash_alg1 ^ hash_alg6, with cycles (946 is the least common multiple of 22 and 86)</span>
+<span class="n">key</span> <span class="o">=</span> <span class="n">z3</span><span class="o">.</span><span class="n">BitVec</span><span class="p">(</span><span class="s1">&#39;key&#39;</span><span class="p">,</span> <span class="mi">8</span> <span class="o">*</span> <span class="mi">946</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">key</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">//</span> <span class="mi">8</span><span class="p">):</span>
+    <span class="n">i_alg1</span> <span class="o">=</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">22</span>
+    <span class="n">alg1_char</span> <span class="o">=</span> <span class="n">z3</span><span class="o">.</span><span class="n">Extract</span><span class="p">(</span><span class="mi">8</span> <span class="o">*</span> <span class="n">i_alg1</span> <span class="o">+</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span> <span class="o">*</span> <span class="n">i_alg1</span><span class="p">,</span> <span class="n">hash_alg1</span><span class="p">)</span>
+    <span class="n">i_alg6</span> <span class="o">=</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">86</span>
+    <span class="n">alg6_char</span> <span class="o">=</span> <span class="n">z3</span><span class="o">.</span><span class="n">Extract</span><span class="p">(</span><span class="mi">8</span> <span class="o">*</span> <span class="n">i_alg6</span> <span class="o">+</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span> <span class="o">*</span> <span class="n">i_alg6</span><span class="p">,</span> <span class="n">hash_alg6</span><span class="p">)</span>
+    <span class="n">s</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">z3</span><span class="o">.</span><span class="n">Extract</span><span class="p">(</span><span class="mi">8</span> <span class="o">*</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span> <span class="o">*</span> <span class="n">i</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span> <span class="o">==</span> <span class="n">alg1_char</span> <span class="o">^</span> <span class="n">alg6_char</span><span class="p">)</span>
+
+<span class="c1"># Find available bytes for each byte of the key</span>
+<span class="k">for</span> <span class="n">bytepos</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">key</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">//</span> <span class="mi">8</span><span class="p">):</span>
+    <span class="n">selectedbytes</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">([</span><span class="nb">ord</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">off</span><span class="p">])</span> <span class="k">for</span> <span class="n">off</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">bytepos</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="mi">946</span><span class="p">)])</span>
+    <span class="n">avail_keys</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">256</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">sb</span> <span class="o">^</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">VALID_BYTES</span> <span class="k">for</span> <span class="n">sb</span> <span class="ow">in</span> <span class="n">selectedbytes</span><span class="p">):</span>
+            <span class="n">avail_keys</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">avail_keys</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
+    <span class="n">keybyte</span> <span class="o">=</span> <span class="n">z3</span><span class="o">.</span><span class="n">Extract</span><span class="p">(</span><span class="mi">8</span> <span class="o">*</span> <span class="n">bytepos</span> <span class="o">+</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span> <span class="o">*</span> <span class="n">bytepos</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+    <span class="n">s</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">z3</span><span class="o">.</span><span class="n">Or</span><span class="p">([</span><span class="n">keybyte</span> <span class="o">==</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">avail_keys</span><span class="p">]))</span>
+
+<span class="c1"># Crack the key</span>
+<span class="k">while</span> <span class="n">s</span><span class="o">.</span><span class="n">check</span><span class="p">()</span> <span class="o">==</span> <span class="n">z3</span><span class="o">.</span><span class="n">sat</span><span class="p">:</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">model</span><span class="p">()</span>
+    <span class="n">hash1</span> <span class="o">=</span> <span class="n">m</span><span class="p">[</span><span class="n">hash_alg1</span><span class="p">]</span><span class="o">.</span><span class="n">as_long</span><span class="p">()</span>
+    <span class="n">hash6</span> <span class="o">=</span> <span class="n">m</span><span class="p">[</span><span class="n">hash_alg6</span><span class="p">]</span><span class="o">.</span><span class="n">as_long</span><span class="p">()</span>
+    <span class="n">s</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">hash_alg1</span> <span class="o">!=</span> <span class="n">hash1</span><span class="p">)</span>
+    <span class="n">hash1bytes</span> <span class="o">=</span> <span class="n">b</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">chr</span><span class="p">((</span><span class="n">hash1</span> <span class="o">&gt;&gt;</span> <span class="n">i</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0xff</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">hash_alg1</span><span class="o">.</span><span class="n">size</span><span class="p">(),</span> <span class="mi">8</span><span class="p">)])</span>
+    <span class="n">hash6bytes</span> <span class="o">=</span> <span class="n">b</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">chr</span><span class="p">((</span><span class="n">hash6</span> <span class="o">&gt;&gt;</span> <span class="n">i</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0xff</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">hash_alg6</span><span class="o">.</span><span class="n">size</span><span class="p">(),</span> <span class="mi">8</span><span class="p">)])</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Hash $1$: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">hash1bytes</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">)))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Hash $6$: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">hash6bytes</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">)))</span>
+
+    <span class="c1"># Decrypt the file</span>
+    <span class="n">keyval</span> <span class="o">=</span> <span class="n">m</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">as_long</span><span class="p">()</span>
+    <span class="n">s</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">key</span> <span class="o">!=</span> <span class="n">keyval</span><span class="p">)</span>
+    <span class="n">keybytes</span> <span class="o">=</span> <span class="p">[(</span><span class="n">keyval</span> <span class="o">&gt;&gt;</span> <span class="n">i</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0xff</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">key</span><span class="o">.</span><span class="n">size</span><span class="p">(),</span> <span class="mi">8</span><span class="p">)]</span>
+    <span class="n">clearbytes</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)):</span>
+        <span class="n">clearbytes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">ord</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">^</span> <span class="n">keybytes</span><span class="p">[</span><span class="n">i</span> <span class="o">%</span> <span class="mi">946</span><span class="p">]</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;file2_decrypted.out.b64&#39;</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">clearbytes</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This script finds the two hashes and successfully decrypts <code class="docutils literal"><span class="pre">file2</span></code>.
+However this does not seem to be the intended way of solving this challenge, as the key to decrypt <code class="docutils literal"><span class="pre">file2</span></code> is also buried deep into <code class="docutils literal"><span class="pre">file1</span></code>.
+Let&#8217;s describe the standard solving path instead of taking this amazing shortcut!</p>
+</div>
+<div class="section" id="file1">
+<h2><code class="docutils literal"><span class="pre">file1</span></code><a class="headerlink" href="#file1" title="Permalink to this headline">¶</a></h2>
+<p>The decrypted <code class="docutils literal"><span class="pre">file1</span></code> is an MPEG video which contains an hexadecimal line at the bottom, which seems to dump a file.
+Using <code class="docutils literal"><span class="pre">ffmpeg</span></code> to extract the video frames and after doing some custom OCR, the file is extracted:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ mkdir file1-frames/
+$ ffmpeg -i file1_decrypted.out file1-frames/frame%05d.png
+$ ./file1_extract_framehex.py
+$ file file1_framehex.out
+file1_framehex.out.bin: ELF 64-bit LSB executable, x86-64, version 1 (SYSV),
+dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, for GNU/Linux
+2.6.24, BuildID[sha1]=796e8cb3fec1f948780986af22fbd1348c3db003, stripped
+</pre></div>
+</div>
+<p>This function decrypts a payload which is present after the video data with a key which is tested by a function at <code class="docutils literal"><span class="pre">.text:40084D</span></code>.
+A little bit of z3 solving allows to retrieve the encryption key, <code class="docutils literal"><span class="pre">Have_you_guessed_the_riddle_yet</span></code>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ ./file1_framehex.out file1_decrypted.out Have_you_guessed_the_riddle_yet 2&gt; file1_video_payload.out
+Curiouser and curiouser!
+$ file file1_video_payload.out
+file1_video_payload.out: RIFF (little-endian) data, WAVE audio, Microsoft PCM, 16 bit, stereo 44100 Hz
+</pre></div>
+</div>
+<p>Running <code class="docutils literal"><span class="pre">strings</span></code> on this new file reveals this message:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>The first part of the password is &quot;Use_me_to_d3crypt_&quot;. It can be used to
+decrypt the next step. But, before using it, have you find the second part?
+</pre></div>
+</div>
+<p>Audacity shows weird peaks in the wave signal of this audio file.
+This is due to some bytes which have been hidden into the data with a given period.
+Some experiments lead to extracting one byte every 46907 bytes starting from offset 576:</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="kn">import</span> <span class="nn">struct</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;file1_video_payload.out&#39;</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="c1"># skip header and footer</span>
+    <span class="n">WAVDATA</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()[</span><span class="mi">44</span><span class="p">:</span><span class="mh">0x69ed48</span><span class="p">]</span>
+
+<span class="c1"># Extract message</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">576</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">WAVDATA</span><span class="p">),</span> <span class="mi">46907</span><span class="p">):</span>
+    <span class="n">sample</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="n">WAVDATA</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">sample</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">break</span>
+    <span class="nb">print</span><span class="p">(</span><span class="nb">chr</span><span class="p">(</span><span class="n">sample</span><span class="p">),</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The message is:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>Congratulation for finding me !
+
+The second part of the password is &quot;the_last_3ncrypted_file&quot;
+It can be used to decrypt the next step.
+@&lt;;;
+</pre></div>
+</div>
+<p>The password <code class="docutils literal"><span class="pre">Use_me_to_d3crypt_the_last_3ncrypted_file</span></code> can be used to decrypt <code class="docutils literal"><span class="pre">file2</span></code>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ ./step1.bin file2 Use_me_to_d3crypt_the_last_3ncrypted_file 2&gt; file2_decrypted.out.b64
+Begin at the beginning, and go on till you come to the end: then stop.
+
+$ base64 -d &lt; file2_decrypted.out.b64 &gt; file2_decrypted.out
+$ file file2_decrypted.out
+file2_decrypted.out: ELF 32-bit LSB executable, Intel 80386, version 1 (SYSV),
+statically linked, BuildID[sha1]=8c36a356734d8731a544c3d66f2eafc2d25475de, stripped
+</pre></div>
+</div>
+</div>
+<div class="section" id="file2">
+<h2><code class="docutils literal"><span class="pre">file2</span></code><a class="headerlink" href="#file2" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal"><span class="pre">file2</span></code> is a x86-32 bit Linux program which is verifying a password given as a parameter:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ ./file2_decrypted.out
+Usage: ./chall.bin &lt;pass&gt;
+$ ./file2_decrypted.out &#39;&lt;pass&gt;&#39;
+Wait please...
+Oh my ears and whiskers. You are completely wrong :(
+</pre></div>
+</div>
+<p>This program decrypts itself using XOR encryption with many level of decryption.
+Too many for attempting to decrypt it by hand, and as the program re-encrypts itself before exiting, it is not possible to catch the exit system call to dump the decrypted program.
+Moreover <code class="docutils literal"><span class="pre">strace</span></code> shows that this program calls <code class="docutils literal"><span class="pre">signal(SIGTRAP...)</span></code> many times, with increasing addresses.</p>
+<p>gdb can detects that the program reached some deeply-buried addresses using these instructions:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>watch *0x080754FD if $pc &gt;= 0x80753F9
+commands
+break *0x080754FD
+continue
+end
+r pass
+</pre></div>
+</div>
+<p>gdb would display something similar to:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>Starting program: /tmp/chall5/file2_decrypted.out pass
+Wait please...
+
+Hardware watchpoint 1: *0x080754FD
+
+Old value = -419722244
+New value = -419722923
+0x080753fb in ?? ()
+=&gt; 0x080753fb:    83 c2 04    add    $0x4,%edx
+Breakpoint 2 at 0x80754fd
+
+Hardware watchpoint 1: *0x080754FD
+
+Old value = -419722923
+New value = -2082109099
+0x080753fb in ?? ()
+=&gt; 0x080753fb:    83 c2 04    add    $0x4,%edx
+Breakpoint 3 at 0x80754fd
+
+Breakpoint 2, 0x080754fd in ?? ()
+=&gt; 0x080754fd:    55    push   %ebp
+</pre></div>
+</div>
+<p>The <code class="docutils literal"><span class="pre">backtrace</span></code> command shows that the program is now under 500 levels of decryption/calls.
+To extract it:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">dump</span> <span class="n">memory</span> <span class="n">file2_clear</span><span class="o">.</span><span class="n">out</span> <span class="mh">0x8048000</span> <span class="mh">0x807b000</span>
+</pre></div>
+</div>
+<p>Some reverse-engineering work leads to understanding that the function at <code class="docutils literal"><span class="pre">.text:080754FD</span></code> is testing the password, which is read through a pointer is <code class="docutils literal"><span class="pre">esi</span></code> register, by hashing it with an algorithm similar to MD5 but with different constants.
+Here is the algorithm with the differences with the one from Wikipedia (<a class="reference external" href="https://en.wikipedia.org/wiki/MD5">https://en.wikipedia.org/wiki/MD5</a>):</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>//Note: All variables are unsigned 32 bit and wrap modulo 2^32 when calculating
+var int[64] s, K
+
+//s specifies the per-round shift amounts
+s[ 0..15] := { 7, 12, 17, 22,  7, 12, 17, 22,  7, 12, 17, 22,  7, 12, 17, 22 }
+s[16..31] := { 5,  9, 14, 20,  5,  9, 14, 20,  5,  9, 14, 20,  5,  9, 14, 20 }
+s[32..47] := { 4, 11, 16, 23,  4, 11, 16, 23,  4, 11, 16, 23,  4, 11, 16, 23 }
+s[48..63] := { 6, 10, 15, 21,  6, 10, 15, 21,  6, 10, 15, 21,  6, 10, 15, 21 }
+
+// K[0..27] differs with MD5. It is at .text:08075A5B
+K[0..63] := {
+    0x14F02B43, 0x89C0E4CA, 0x2EE6E47B, 0x177ECEBF,
+    0xA20C3D34, 0x5124C3C0, 0x1AEEF40C, 0x31675B41,
+    0xCDB50C26, 0xF0789AA0, 0xFB54C0D4, 0xD58AD882,
+    0x393E1CD7, 0x04BD0A4B, 0x28C0426E, 0xCA5F186C,
+    0xC662BCD1, 0x0F06B131, 0x5A70DAF6, 0x7A7FF510,
+    0x7829CDD8, 0xA1EB40D7, 0xDB2A8729, 0xB51A8A3D,
+    0xD84E797A, 0xCC1F406D, 0xE182486D, 0x26E4F7DD,
+// from K[28..31], the arrays are the same:
+    0xA9E3E905, 0xFCEFA3F8, 0x676F02D9, 0x8D2A4C8A,
+    0xFFFA3942, 0x8771F681, 0x6D9D6122, 0xFDE5380C,
+    0xA4BEEA44, 0x4BDECFA9, 0xF6BB4B60, 0xBEBFBC70,
+    0x289B7EC6, 0xEAA127FA, 0xD4EF3085, 0x04881D05,
+    0xD9D4D039, 0xE6DB99E5, 0x1FA27CF8, 0xC4AC5665,
+    0xF4292244, 0x432AFF97, 0xAB9423A7, 0xFC93A039,
+    0x655B59C3, 0x8F0CCC92, 0xFFEFF47D, 0x85845DD1,
+    0x6FA87E4F, 0xFE2CE6E0, 0xA3014314, 0x4E0811A1,
+    0xF7537E82, 0xBD3AF235, 0x2AD7D2BB, 0xEB86D391,
+}
+
+//Initialize variables with custom constants
+var int a0 := 0xFD45F22F   //A
+var int b0 := 0x1431EE0C   //B
+var int c0 := 0x1458EF65   //C
+var int d0 := 0x455684AA   //D
+
+//Pre-processing: adding a single 1 bit
+append &quot;1&quot; bit to message
+//Pre-processing: padding with zeros
+append &quot;0&quot; bit until message length in bits ≡ 448 (mod 512)
+append original length in bits mod (2 pow 64) to message
+
+//Process the message in successive 512-bit chunks:
+for each 512-bit chunk of message
+    break chunk into sixteen 32-bit words M[j], 0 ≤ j ≤ 15
+//Initialize hash value for this chunk:
+    var int A := a0
+    var int B := b0
+    var int C := c0
+    var int D := d0
+//Main loop:
+    for i from 0 to 63
+        if 0 ≤ i ≤ 15 then
+            F := (B and C) or ((not B) and D)
+            g := i
+        else if 16 ≤ i ≤ 31
+            F := (D and B) or ((not D) and C)
+            g := (5×i + 1) mod 16
+        else if 32 ≤ i ≤ 47
+            F := B xor C xor D
+            g := (3×i + 5) mod 16
+        else if 48 ≤ i ≤ 63
+            F := C xor (B or (not D))
+            g := (7×i) mod 16
+        dTemp := D
+        D := C
+        C := B
+        B := B + leftrotate((A + F + K[i] + M[g]), s[i])
+        A := dTemp
+    end for
+//Add this chunk&#39;s hash to result so far:
+    a0 := a0 + A
+    b0 := b0 + B
+    c0 := c0 + C
+    d0 := d0 + D
+end for
+
+var char digest[16] := a0 append b0 append c0 append d0 //(Output is in little-endian)
+
+//leftrotate function definition
+leftrotate (x, c)
+    return (x &lt;&lt; c) binary or (x &gt;&gt; (32-c));
+</pre></div>
+</div>
+<p>To crack this password, the most straightforward way seems to be to bruteforce it using <a class="reference external" href="https://crackstation.net/">https://crackstation.net/</a> wordlist and a C program which rips the function.</p>
+<div class="code c highlight-default"><div class="highlight"><pre><span></span><span class="o">/**</span>
+ <span class="o">*</span> <span class="n">Test</span> <span class="n">every</span> <span class="n">password</span> <span class="kn">from</span> <span class="nn">a</span> <span class="n">file</span> <span class="k">with</span> <span class="n">file2</span><span class="s1">&#39;s custom MD5-like hash function</span>
+ <span class="o">*</span>
+ <span class="o">*</span> <span class="n">Usage</span><span class="p">:</span>
+ <span class="o">*</span>     <span class="n">clang</span> <span class="o">-</span><span class="n">O2</span> <span class="o">-</span><span class="n">Wall</span> <span class="o">-</span><span class="n">m32</span> <span class="n">runhashes</span><span class="o">.</span><span class="n">c</span> <span class="o">-</span><span class="n">o</span> <span class="n">runhashes</span><span class="o">.</span><span class="n">bin</span>
+ <span class="o">*</span>     <span class="o">./</span><span class="n">runhashes</span><span class="o">.</span><span class="n">bin</span> <span class="o">&lt;</span> <span class="n">password_list</span>
+ <span class="o">*</span>
+ <span class="o">*</span> <span class="n">With</span> <span class="n">JTR</span><span class="p">:</span>
+ <span class="o">*</span>     <span class="n">john</span> <span class="o">--</span><span class="n">wordlist</span><span class="o">=</span><span class="n">john</span><span class="o">.</span><span class="n">txt</span> <span class="o">--</span><span class="n">rules</span> <span class="o">--</span><span class="n">stdout</span> <span class="o">|</span> <span class="o">./</span><span class="n">runhashes</span><span class="o">.</span><span class="n">bin</span>
+ <span class="o">*/</span>
+<span class="c1">#include &lt;assert.h&gt;</span>
+<span class="c1">#include &lt;fcntl.h&gt;</span>
+<span class="c1">#include &lt;stdio.h&gt;</span>
+<span class="c1">#include &lt;stdint.h&gt;</span>
+<span class="c1">#include &lt;string.h&gt;</span>
+<span class="c1">#include &lt;sys/mman.h&gt;</span>
+
+<span class="nb">int</span> <span class="n">main</span><span class="p">(</span><span class="n">void</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="nb">int</span> <span class="n">fd</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;file2_clear.out&quot;</span><span class="p">,</span> <span class="n">O_RDONLY</span><span class="p">);</span>
+    <span class="k">assert</span><span class="p">(</span><span class="n">fd</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">);</span>
+
+    <span class="n">uint8_t</span> <span class="o">*</span><span class="n">mem</span> <span class="o">=</span> <span class="n">mmap</span><span class="p">(</span><span class="n">NULL</span><span class="p">,</span> <span class="mi">208896</span><span class="p">,</span> <span class="n">PROT_READ</span><span class="o">|</span><span class="n">PROT_EXEC</span><span class="p">,</span> <span class="n">MAP_PRIVATE</span><span class="p">,</span> <span class="n">fd</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+    <span class="k">assert</span><span class="p">(</span><span class="n">mem</span> <span class="o">!=</span> <span class="n">MAP_FAILED</span><span class="p">);</span>
+
+    <span class="o">/*</span> <span class="n">call</span> <span class="o">.</span><span class="n">text</span><span class="p">:</span><span class="mi">080754</span><span class="n">FD</span> <span class="n">function</span> <span class="p">(</span><span class="n">performs</span> <span class="nb">hash</span> <span class="ow">and</span> <span class="n">compare</span><span class="p">)</span>
+     <span class="o">*</span> <span class="n">ELF</span> <span class="n">program</span> <span class="n">header</span><span class="p">:</span>
+     <span class="o">*</span>     <span class="n">LOAD</span> <span class="n">off</span>    <span class="mh">0x00000074</span> <span class="n">vaddr</span> <span class="mh">0x08048074</span> <span class="n">paddr</span> <span class="mh">0x08048074</span> <span class="n">align</span> <span class="mi">2</span><span class="o">**</span><span class="mi">4</span>
+     <span class="o">*</span>          <span class="n">filesz</span> <span class="mh">0x00032e1c</span> <span class="n">memsz</span> <span class="mh">0x00032e1c</span> <span class="n">flags</span> <span class="n">rw</span>
+     <span class="o">*</span> <span class="o">=&gt;</span> <span class="n">offset</span> <span class="mh">0x080754FD</span><span class="o">-</span><span class="mh">0x08048000</span> <span class="o">=</span> <span class="mh">0x2d4fd</span>
+     <span class="o">*/</span>
+    <span class="n">void</span> <span class="o">*</span><span class="n">fct_hash_and_test</span> <span class="o">=</span> <span class="n">mem</span> <span class="o">+</span> <span class="mh">0x2d4fd</span><span class="p">;</span>
+    <span class="n">char</span> <span class="n">password</span><span class="p">[</span><span class="mi">4096</span><span class="p">];</span>
+    <span class="nb">int</span> <span class="n">cnt</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="k">while</span> <span class="p">(</span><span class="n">fgets</span><span class="p">(</span><span class="n">password</span><span class="p">,</span> <span class="n">sizeof</span><span class="p">(</span><span class="n">password</span><span class="p">),</span> <span class="n">stdin</span><span class="p">))</span> <span class="p">{</span>
+        <span class="n">size_t</span> <span class="nb">len</span> <span class="o">=</span> <span class="n">strlen</span><span class="p">(</span><span class="n">password</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">len</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="n">password</span><span class="p">[</span><span class="nb">len</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">password</span><span class="p">[</span><span class="nb">len</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+        <span class="n">uint32_t</span> <span class="n">result</span><span class="p">;</span>
+        <span class="n">__asm__</span> <span class="n">volatile</span><span class="p">(</span>
+            <span class="s2">&quot;call *%[fct]&quot;</span>
+            <span class="p">:</span> <span class="p">[</span><span class="n">res</span><span class="p">]</span> <span class="s2">&quot;=D&quot;</span> <span class="p">(</span><span class="n">result</span><span class="p">)</span> <span class="o">/*</span> <span class="n">result</span> <span class="ow">is</span> <span class="ow">in</span> <span class="n">edi</span> <span class="o">*/</span>
+            <span class="p">:</span> <span class="p">[</span><span class="n">fct</span><span class="p">]</span> <span class="s2">&quot;r&quot;</span> <span class="p">(</span><span class="n">fct_hash_and_test</span><span class="p">),</span> <span class="p">[</span><span class="k">pass</span><span class="p">]</span> <span class="s2">&quot;S&quot;</span> <span class="p">(</span><span class="n">password</span><span class="p">)</span>
+            <span class="p">:</span> <span class="s2">&quot;memory&quot;</span><span class="p">,</span> <span class="s2">&quot;cc&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%e</span><span class="s2">ax&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%e</span><span class="s2">bx&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%e</span><span class="s2">dx&quot;</span>
+        <span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">result</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">printf</span><span class="p">(</span><span class="s2">&quot;success! </span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">password</span><span class="p">);</span>
+            <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="n">cnt</span> <span class="o">++</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">cnt</span> <span class="o">%</span> <span class="mi">100000</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">printf</span><span class="p">(</span><span class="s2">&quot;(</span><span class="si">%d</span><span class="s2">) failed </span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">cnt</span><span class="p">,</span> <span class="n">password</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>After less than 30 seconds, this program tested more than 13 million passwords and found <code class="docutils literal"><span class="pre">bunnyrabbit</span></code>.
+Let&#8217;s try this with the real program:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ ./file2_decrypted.out bunnyrabbit
+Wait please...
+Congratulation! You found the White Rabbit!
+
+      ***
+     ** **
+    **   **
+    **   **         ****
+    **   **       **   ****
+    **  **       *   **   **
+     **  *      *  **  ***  **
+      **  *    *  **     **  *
+       ** **  **  **       **
+       **   **  **
+      *           *
+     *             *
+    *    0     0    *
+    *   /   @   \   *
+    *   \__/ \__/   *
+      *     W     *
+        **     **
+          *****
+
+The flag is the sha256sum of the password.
+Send it (and your write-up if you have one) to merenwen@hackinparis.com
+</pre></div>
+</div>
+<p>The flag is the SHA256 hash of &#8220;bunnyrabbit&#8221;, which is <strong>7794db9a8656587526b3764d8f1354614ea13c035fe03fda47dd41bd1e5762a7</strong>.</p>
+</div>
+</div>
+
+
+      </div>
+      <div class="bottomnav" role="navigation" aria-label="bottom navigation">
+      
+        <p>
+        «&#160;&#160;<a href="challenge4.html">Hack In Paris Challenge 4</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        </p>
+
+      </div>
+
+  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="challenge4.html" title="Hack In Paris Challenge 4"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">HIPChall 2016 write-up</a> &raquo;</li> 
+      </ul>
+    </div>
+  
+    <!-- Original code from http://tholman.com/github-corners/ -->
+    <a href="https://github.com/fishilico/hackinparis-2016" class="github-corner"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;">
+      <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+      <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+      <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path>
+    </svg></a>
+    <style>
+      .github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}
+      @keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}
+      @media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}
+    </style>
+  
+
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2016, Nicolas Iooss, beerware license.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.5.
+    </div>
+  </body>
+</html>
