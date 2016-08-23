@@ -9,4 +9,7 @@ Here is a write-up for the 5 challenges of Hack In Paris Challenge 2016, #HIPCHA
 * challenge4.rst solves https://hackinparis.com/challenge-4.html
 * challenge5.rst solves https://hackinparis.com/challenge-5.html
 
+The Sphinx-generated files are available on the GitHub Pages of this project:
+https://fishilico.github.io/hackinparis-2016/
+
 This amazing challenge has been organized thanks to `@sysdream <https://twitter.com/sysdream>`_ and `@hackinparis <https://twitter.com/hackinparis>`_.
